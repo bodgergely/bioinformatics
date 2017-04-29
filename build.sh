@@ -1,1 +1,2 @@
-g++ -std=c++11 -g -O2 -o hiddenmessage hiddenmessage.cpp rdtsc.cpp
+mkdir -p ../build
+g++ -std=c++11 -g -O2 -o ../build/hiddenmessage hiddenmessage.cpp rdtsc.cpp
