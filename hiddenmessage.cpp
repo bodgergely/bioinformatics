@@ -16,8 +16,6 @@
 #include <cmath>
 #include <unordered_map>
 
-#include <sys/mman.h>
-
 using namespace std;
 
 double avgCyclesPerMicroSec = 2394.74;
@@ -338,7 +336,6 @@ public:
 	Genome(const string& text) : _genome(text) {}
 	vector<string> findMostFreqKmers(int k)
 	{
-		//void* mem = mmap(NULL, text.size()-k +1, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_POPULATE|MAP_ANONYMOUS|MAP_HUGE_TLB|MAP_HUGE_2MB)
 		vector<int> coded;
 		const string& text = _genome;
 		coded.reserve(text.size()-k+1);
@@ -350,7 +347,6 @@ public:
 
 		//ull s = rdtsc();
 		sort(coded.begin(), coded.end());
-		cout << getpagesize() << endl;
 		//ull e = rdtsc();
 		//printf("coded size: %lu sort took: %f\n", coded.size(), (e - s)/ avgCyclesPerMicroSec);
 
