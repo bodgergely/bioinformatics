@@ -170,7 +170,7 @@ class Genome:
     
         return res
         
-
+"""
 import sys
 
 file = sys.argv[1]
@@ -184,7 +184,7 @@ print "Took secs: " + str((end - start))
 for k in kmers:
     print k   
         
-        
+"""     
         
         
         

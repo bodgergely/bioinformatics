@@ -115,6 +115,12 @@ inline int patternToNumber(const char* s, int k)
 	return loc;
 }
 
+inline int fastNextPos(int prevpos, int k, int nextval)
+{
+	return ((prevpos % (1 << 2*(k-1))) << 2) +  nextval;
+}
+
+
 string numToPattern(int pos, int k)
 {
 	static const int alphabet[] = {'A', 'C', 'G', 'T'};
@@ -161,7 +167,7 @@ void printFreqArray(int* array, int size)
 
 vector<string> freqArray(const string& text, int k)
 {
-	int  kmerCount = pow(4, k);
+	int  kmerCount = (0x01 << (k*2));
 	int* array = new int[kmerCount];
 	memset(array, 0, sizeof(int) * kmerCount);
 	int maxc = 0;
@@ -332,7 +338,13 @@ vector<measures> competition()
 class Genome
 {
 public:
-	Genome(const string& text) : _genome(text) {}
+	Genome(const string& text) : _genome(text)
+	{
+		_nucleoLookup['A'] = 0;
+		_nucleoLookup['C'] = 1;
+		_nucleoLookup['G'] = 2;
+		_nucleoLookup['T'] = 3;
+	}
 	pair<vector<string>, int> findMostFreqKmers(int k)
 	{
 		return findMostFreqKmers(_genome.c_str(), _genome.size(), k);
@@ -406,7 +418,7 @@ public:
 	vector<string> clumpsNaive(int k, int L, int t)
 	{
 
-		int  kmerCount = pow(4, k);
+		int  kmerCount = (0x01 << (k*2));
 		int* clump = new int[kmerCount];
 		memset(clump, 0, sizeof(int) * kmerCount);
 		const char* text = _genome.c_str();
@@ -448,7 +460,7 @@ public:
 	vector<string> clumps(int k, int L, int t)
 	{
 
-		int  kmerCount = pow(4, k);
+		int  kmerCount = (0x01 << (k*2));
 		char* clump = new char[kmerCount];
 		memset(clump, 0, sizeof(char) * kmerCount);
 		int genomeSize = _genome.size();
@@ -456,22 +468,31 @@ public:
 
 		int* temp = new int[kmerCount];
 		memset(temp, 0, sizeof(int) * kmerCount);
-		for(int i=0;i<L - k + 1;i++)
+		int prevLoc = patternToNumber(text, k);
+		int backLoc = prevLoc;
+		temp[prevLoc]++;
+		if(temp[prevLoc] >= t)
+			clump[prevLoc] = 1;
+		for(int i=1;i<L - k + 1;i++)
 		{
-			int loc = patternToNumber(text + i, k);
+			//int loc = patternToNumber(text + i, k);
+			int loc = fastNextPos(prevLoc, k, _nucleoLookup[text[i + k - 1]]);
 			temp[loc]++;
 			if(temp[loc] >= t)
 				clump[loc] = 1;
+			prevLoc = loc;
 		}
 
 		for(int i=1;i<genomeSize-L+1;i++)
 		{
-			int loc  = patternToNumber(text + i-1, k);
-			temp[loc]--;
-			loc = patternToNumber(text + i + L-k, k);
-			temp[loc]++;
-			if(temp[loc] >= t)
-				clump[loc] = 1;
+			//int loc  = patternToNumber(text + i-1, k);
+			temp[backLoc]--;
+			backLoc = fastNextPos(backLoc, k, _nucleoLookup[text[i + L - 1]]);
+			//loc = patternToNumber(text + i + L-k, k);
+			prevLoc = fastNextPos(prevLoc, k, _nucleoLookup[text[i + L - 1]]);
+			temp[prevLoc]++;
+			if(temp[prevLoc] >= t)
+				clump[prevLoc] = 1;
 		}
 
 		vector<string> res;
@@ -491,7 +512,10 @@ public:
 
 private:
 	const string& _genome;
+	char 		 _nucleoLookup[256];
 };
+
+
 
 
 int main()
