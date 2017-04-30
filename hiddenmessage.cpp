@@ -461,7 +461,6 @@ public:
 		for(int i=0;i<L - k + 1;i++)
 		{
 			int loc = patternToNumber(text + i, k);
-			//cout << loc << " ";
 			temp[loc]++;
 			if(temp[loc] >= t)
 				clump[loc] = 1;
@@ -469,9 +468,9 @@ public:
 
 		for(int i=1;i<genomeSize-L+1;i++)
 		{
-			//int loc  = patternToNumber(text + i-1, k);
-			//temp[loc]--;
-			int loc = patternToNumber(text + i + L-k, k);
+			int loc  = patternToNumber(text + i-1, k);
+			temp[loc]--;
+			loc = patternToNumber(text + i + L-k, k);
 			temp[loc]++;
 			if(temp[loc] >= t)
 				clump[loc] = 1;
