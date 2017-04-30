@@ -473,11 +473,11 @@ public:
 		temp[prevLoc]++;
 		if(temp[prevLoc] >= t)
 			clump[prevLoc] = 1;
+
 		for(int i=1;i<L - k + 1;i++)
 		{
-			//int loc = patternToNumber(text + i, k);
 			int loc = fastNextPos(prevLoc, k, _nucleoLookup[text[i + k - 1]]);
-			temp[loc]+=1;
+			temp[loc]++;
 			if(temp[loc] >= t)
 				clump[loc] = 1;
 			prevLoc = loc;
@@ -485,12 +485,10 @@ public:
 
 		for(int i=1;i<genomeSize-L+1;i++)
 		{
-			//int loc  = patternToNumber(text + i-1, k);
 			temp[backLoc]--;
-			backLoc = fastNextPos(backLoc, k, _nucleoLookup[text[i + k - 2]]);
-			//loc = patternToNumber(text + i + L-k, k);
+			backLoc = fastNextPos(backLoc, k, _nucleoLookup[text[i + k - 1]]);
 			prevLoc = fastNextPos(prevLoc, k, _nucleoLookup[text[i + L - 1]]);
-			temp[prevLoc]+=1;
+			temp[prevLoc]++;
 			if(temp[prevLoc] >= t)
 				clump[prevLoc] = 1;
 		}
