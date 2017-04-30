@@ -477,7 +477,7 @@ public:
 		{
 			//int loc = patternToNumber(text + i, k);
 			int loc = fastNextPos(prevLoc, k, _nucleoLookup[text[i + k - 1]]);
-			temp[loc]++;
+			temp[loc]+=1;
 			if(temp[loc] >= t)
 				clump[loc] = 1;
 			prevLoc = loc;
@@ -487,10 +487,10 @@ public:
 		{
 			//int loc  = patternToNumber(text + i-1, k);
 			temp[backLoc]--;
-			backLoc = fastNextPos(backLoc, k, _nucleoLookup[text[i + L - 1]]);
+			backLoc = fastNextPos(backLoc, k, _nucleoLookup[text[i + k - 2]]);
 			//loc = patternToNumber(text + i + L-k, k);
 			prevLoc = fastNextPos(prevLoc, k, _nucleoLookup[text[i + L - 1]]);
-			temp[prevLoc]++;
+			temp[prevLoc]+=1;
 			if(temp[prevLoc] >= t)
 				clump[prevLoc] = 1;
 		}
@@ -545,10 +545,11 @@ int main()
 		cout << "Good answer.\n";
 	}
 
-	//for(string& s: clumps)
-	//{
-	//	cout << s << " ";
-	//}
+	/*for(string& s: clumps)
+	{
+		cout << s << " ";
+	}
+	*/
 
 	return 0;
 }
