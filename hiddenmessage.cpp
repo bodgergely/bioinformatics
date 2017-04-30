@@ -102,12 +102,10 @@ static inline int offset(char c, int pos)
 		if(c == alphabet[i])
 			break;
 	}
-
-	int offs = i * pow(4, pos);
-	return offs;
+	return i * (0x01 << (pos*2));
 }
 
-int inline patternToNumber(const char* s, int k)
+inline int patternToNumber(const char* s, int k)
 {
 	int loc = 0;
 	for(int i=0;i<k;i++)
@@ -124,7 +122,7 @@ string numToPattern(int pos, int k)
 	string s;
 	for(int i=k-1;i>=0;i--)
 	{
-		int t = pow(4, i);
+		int t = (0x01 << (i*2));
 		int l = f/t;
 		s.push_back(alphabet[l]);
 		f = f % t;
