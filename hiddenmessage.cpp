@@ -514,6 +514,15 @@ int main()
 	cout << "Took millisecs: " << (int)((e-s)/avgCyclesPerMicroSec / 1000) << endl;
 	cout << "Number of 9 -mers (500, 3) found: " << clumps.size() << endl;
 
+	if(clumps.size()!=1904)
+	{
+		cout << "Not the correct answer!!!!\n";
+	}
+	else
+	{
+		cout << "Good answer.\n";
+	}
+
 	//for(string& s: clumps)
 	//{
 	//	cout << s << " ";
