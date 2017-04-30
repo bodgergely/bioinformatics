@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 
@@ -92,7 +93,7 @@ vector<string> mostFrequentWords_N2(const string& text, int k)
 	return res;
 }
 
-static int offset(char c, int pos)
+static inline int offset(char c, int pos)
 {
 	static const int alphabet[] = {'A', 'C', 'G', 'T'};
 	int i=0;
@@ -106,7 +107,7 @@ static int offset(char c, int pos)
 	return offs;
 }
 
-int patternToNumber(const char* s, int k)
+int inline patternToNumber(const char* s, int k)
 {
 	int loc = 0;
 	for(int i=0;i<k;i++)
@@ -334,14 +335,18 @@ class Genome
 {
 public:
 	Genome(const string& text) : _genome(text) {}
-	vector<string> findMostFreqKmers(int k)
+	pair<vector<string>, int> findMostFreqKmers(int k)
+	{
+		return findMostFreqKmers(_genome.c_str(), _genome.size(), k);
+	}
+	pair<vector<string>, int> findMostFreqKmers(const char* start, int size, int k)
 	{
 		vector<int> coded;
-		const string& text = _genome;
-		coded.reserve(text.size()-k+1);
-		for(int i=0;i<text.size()-k + 1;i++)
+		const char* text = start;
+		coded.reserve(size-k+1);
+		for(int i=0;i<size-k + 1;i++)
 		{
-			int loc = patternToNumber(text.c_str()+i, k);
+			int loc = patternToNumber(text+i, k);
 			coded.push_back(loc);
 		}
 
@@ -385,7 +390,7 @@ public:
 			res.push_back(numToPattern(l, k));
 		}
 
-		return res;
+		return make_pair(res, maxc);
 
 	}
 	vector<int> findOccurences(const string& pattern)
@@ -399,6 +404,94 @@ public:
 		}
 		return occurences;
 	}
+
+	vector<string> clumpsNaive(int k, int L, int t)
+	{
+
+		int  kmerCount = pow(4, k);
+		int* clump = new int[kmerCount];
+		memset(clump, 0, sizeof(int) * kmerCount);
+		const char* text = _genome.c_str();
+		for(int i=0;i<_genome.size()-L+1;i++)
+		{
+			cout << i << "\n";
+			int* a = new int[kmerCount];
+			memset(a, 0, sizeof(int) * kmerCount);
+			for(int i=0;i<L-k + 1;i++)
+			{
+				int loc = patternToNumber(text + i, k);
+				//cout << loc << " ";
+				a[loc]++;
+			}
+
+			for(int i=0;i<kmerCount;i++)
+			{
+				if(a[i] >= t)
+				{
+					clump[i] = 1;
+				}
+			}
+			delete[] a;
+		}
+
+		vector<string> res;
+		for(int i=0;i<kmerCount;i++)
+		{
+			if(clump[i] == 1)
+			{
+				string p = numToPattern(i, k);
+				res.push_back(p);
+			}
+		}
+		delete[] clump;
+
+		return res;
+	}
+	vector<string> clumps(int k, int L, int t)
+	{
+
+		int  kmerCount = pow(4, k);
+		char* clump = new char[kmerCount];
+		memset(clump, 0, sizeof(char) * kmerCount);
+		int genomeSize = _genome.size();
+		const char* text = _genome.c_str();
+
+		int* temp = new int[kmerCount];
+		memset(temp, 0, sizeof(int) * kmerCount);
+		for(int i=0;i<L - k + 1;i++)
+		{
+			int loc = patternToNumber(text + i, k);
+			//cout << loc << " ";
+			temp[loc]++;
+			if(temp[loc] >= t)
+				clump[loc] = 1;
+		}
+
+		for(int i=1;i<genomeSize-L+1;i++)
+		{
+			//int loc  = patternToNumber(text + i-1, k);
+			//temp[loc]--;
+			int loc = patternToNumber(text + i + L-k, k);
+			temp[loc]++;
+			if(temp[loc] >= t)
+				clump[loc] = 1;
+		}
+
+		vector<string> res;
+		for(int i=0;i<kmerCount;i++)
+		{
+			if(clump[i] == 1)
+			{
+				string p = numToPattern(i, k);
+				res.push_back(p);
+			}
+		}
+		delete[] clump;
+
+		return res;
+	}
+
+
 private:
 	const string& _genome;
 };
@@ -410,31 +503,22 @@ int main()
 	//string pattern = "CTTGATCAT";
 	//getline(std::cin, pattern);
 	getline(std::cin, text);
+	int k;
+	int L;
+	int t;
+	cin >> k >> L >> t;
 
 	Genome genome(text);
 	ull s = rdtsc();
-	vector<string> kmers = genome.findMostFreqKmers(9);
+	vector<string> clumps = genome.clumps(9, 500, 3);
 	ull e = rdtsc();
-	printf("Took secs: %f\n", (e-s)/avgCyclesPerMicroSec/1000000);
-	for(const string& k : kmers)
-	{
-		cout << k << " ";
-	}
-	cout << endl;
-	/*vector<string> kmers = {"CTTGATCAT", "ATGATCAAG"};
+	cout << "Took millisecs: " << (int)((e-s)/avgCyclesPerMicroSec / 1000) << endl;
+	cout << "Number of 9 -mers (500, 3) found: " << clumps.size() << endl;
 
-	for(string& kmer : kmers)
-	{
-		cout << "kmer occurences: " << kmer << endl;
-		vector<int> res = genome.findOccurences(kmer);
-		for(int i=0;i<res.size();i++)
-		{
-			cout << res[i];
-			if(i < res.size()-1)
-				cout << " ";
-		}
-		cout << "\n";
-	}*/
+	//for(string& s: clumps)
+	//{
+	//	cout << s << " ";
+	//}
 
 	return 0;
 }
