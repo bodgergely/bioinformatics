@@ -507,7 +507,59 @@ public:
 		return res;
 	}
 
+	int skew(uint64_t i, uint64_t s=0)
+	{
+		if(s + i > _genome.size())
+			return -1;
 
+		int diff = 0;
+		uint64_t end = s + i;
+		for(uint64_t p=s;p<end;p++)
+		{
+			diff = _skew(diff, p);
+		}
+
+		return diff;
+	}
+
+	vector<int> minimumSkew() const
+	{
+		vector<int> res;
+		int diff = 0;
+		int min = diff;
+
+		for(uint64_t i=0;i<_genome.size();i++)
+		{
+			diff = _skew(diff, i);
+
+			if(diff < min)
+			{
+				min = diff;
+				res.clear();
+				res.push_back(i + 1);
+			}
+			else if(diff == min)
+				res.push_back(i + 1);
+			//cout << diff << "\n";
+		}
+
+		return res;
+	}
+
+	size_t size() const
+	{
+		return _genome.size();
+	}
+
+private:
+	inline	int _skew(int before, uint64_t pos) const
+	{
+		if(_genome[pos] == 'G')
+			before++;
+		else if(_genome[pos] == 'C')
+			before--;
+		return before;
+	}
 private:
 	const string& _genome;
 	char 		 _nucleoLookup[256];
@@ -519,35 +571,23 @@ private:
 int main()
 {
 	string text;
-	//string pattern = "CTTGATCAT";
+	//string pattern = "TAAAGACTGCCGAGAGGCCAACACGAGTGCTAGAACGAGGGGCGTAAACGCGGGTCCGAT";
 	//getline(std::cin, pattern);
 	getline(std::cin, text);
-	int k;
-	int L;
-	int t;
-	cin >> k >> L >> t;
+	//int k;
+	//int L;
+	//int t;
+	//cin >> k >> L >> t;
 
 	Genome genome(text);
-	ull s = rdtsc();
-	vector<string> clumps = genome.clumps(9, 500, 3);
-	ull e = rdtsc();
-	cout << "Took millisecs: " << (int)((e-s)/avgCyclesPerMicroSec / 1000) << endl;
-	cout << "Number of 9 -mers (500, 3) found: " << clumps.size() << endl;
-
-	if(clumps.size()!=1904)
+	auto res = genome.minimumSkew();
+	for(int i=0;i<res.size();i++)
 	{
-		cout << "Not the correct answer!!!!\n";
+		cout << res[i];
+		if(i<res.size()-1)
+			cout << " ";
 	}
-	else
-	{
-		cout << "Good answer.\n";
-	}
-
-	/*for(string& s: clumps)
-	{
-		cout << s << " ";
-	}
-	*/
+	cout << "\n";
 
 	return 0;
 }

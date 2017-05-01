@@ -1,104 +1,9 @@
 
-"""
-
-static int offset(char c, int pos)
-{
-    static const int alphabet[] = {'A', 'C', 'G', 'T'};
-    int i=0;
-    for(;i<4;i++)
-    {
-        if(c == alphabet[i])
-            break;
-    }
-
-    int offs = i * pow(4, pos);
-    return offs;
-}
-
-int patternToNumber(const char* s, int k)
-{
-    int loc = 0;
-    for(int i=0;i<k;i++)
-    {
-        loc+=offset(s[i], k - i - 1);
-    }
-    return loc;
-}
-
-string numToPattern(int pos, int k)
-{
-    static const int alphabet[] = {'A', 'C', 'G', 'T'};
-    int f = pos;
-    string s;
-    for(int i=k-1;i>=0;i--)
-    {
-        int t = pow(4, i);
-        int l = f/t;
-        s.push_back(alphabet[l]);
-        f = f % t;
-    }
-
-    return s;
-}
-
-vector<string> freqArraySorted(const string& text, int k)
-{
-    vector<int> coded;
-    coded.reserve(text.size()-k+1);
-    for(int i=0;i<text.size()-k + 1;i++)
-    {
-        int loc = patternToNumber(text.c_str()+i, k);
-        coded.push_back(loc);
-    }
-
-    //ull s = rdtsc();
-    sort(coded.begin(), coded.end());
-    //ull e = rdtsc();
-    //printf("coded size: %lu sort took: %f\n", coded.size(), (e - s)/ avgCyclesPerMicroSec);
-
-    vector<int> maxLocs;
-    int prev = coded[0];
-    int maxc = 1;
-    int counter = 1;
-    int currLoc = 0;
-    for(int i=1;i<coded.size();i++)
-    {
-        if(coded[i]!=prev)
-        {
-            if(counter > maxc)
-            {
-                maxc = counter;
-                maxLocs.clear();
-                maxLocs.push_back(coded[currLoc]);
-            }
-            else if(counter == maxc)
-            {
-                maxLocs.push_back(coded[currLoc]);
-            }
-            currLoc = i;
-            counter = 1;
-            prev = coded[i];
-        }
-        else
-        {
-            counter++;
-        }
-    }
-
-    vector<string> res;
-    for(int l : maxLocs)
-    {
-        res.push_back(numToPattern(l, k));
-    }
-
-    return res;
-
-}
-
-"""
 
 import math
 import time
+from matplotlib import pyplot as plt
+import sys
 
 def offset(c, pos):
     alphabet = ['A', 'C', 'G', 'T']
@@ -170,6 +75,23 @@ class Genome:
     
         return res
         
+        
+        
+def plot(rows):
+    plt.plot(rows)
+    plt.show()
+
+
+def readFile(file):
+    f = open(file, 'r')
+    rows = []
+    for l in f:
+        rows.append(int(l))
+    return rows
+
+rows = readFile(sys.argv[1])
+plot(rows)
+
 """
 import sys
 
