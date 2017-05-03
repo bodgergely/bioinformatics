@@ -405,6 +405,135 @@ vector<uint64_t> findOccurences(const char* pattern, int patternLen, const char*
 	return occurences;
 }
 
+static char nucleos[] = {'A', 'C', 'G', 'T'};
+
+int hammingDistance(const char* s1, const char* s2, int len)
+{
+	int diff = 0;
+	for(int i=0;i<len;i++)
+	{
+		if(*s1++!=*s2++)
+			diff++;
+	}
+	return diff;
+}
+
+vector<uint64_t> approximatePatternMatch(const char* pattern, int patternLen, const char* text, int textLen, int mismatchLimit)
+{
+	if(patternLen > textLen)
+		return vector<uint64_t>();
+
+	int k = patternLen;
+	const char* textEnd = text+textLen;
+
+	vector<uint64_t> res;
+	for(const char* t=text;t<=textEnd-patternLen;t++)
+	{
+		if(hammingDistance(t, pattern, patternLen) <= mismatchLimit)
+		{
+			res.push_back(t - text);
+		}
+	}
+
+	return res;
+}
+
+uint32_t approximatePatternCount(const char* pattern, int patternLen, const char* text, int textLen, int mismatchLimit)
+{
+	auto res =  approximatePatternMatch(pattern, patternLen, text, textLen, mismatchLimit);
+	return res.size();
+}
+
+
+static void _generateSimilar(const char* pattern, int patternLen, int pos, int l, int mismatchLimit, char* buffer, int* table)
+{
+	if(pos == patternLen || l > mismatchLimit)
+	{
+		return;
+	}
+	for(int p=pos;p<patternLen;p++)
+	{
+		char c = pattern[p];
+		for(int i=0;i<4;i++)
+		{
+			buffer[p] = nucleos[i];
+			table[patternToNumber(buffer, patternLen)] = 1;
+			_generateSimilar(pattern, patternLen, pos+1, l+1, mismatchLimit, buffer, table);
+		}
+		buffer[p] = c;
+	}
+}
+
+void generateSimilar(const char* pattern, int patternLen, int mismatchLimit, int* table)
+{
+	char* buffer = new char[patternLen];
+	memcpy(buffer, pattern, patternLen);
+	table[patternToNumber(buffer, patternLen)] = 1;
+	_generateSimilar(pattern, patternLen, 0, 1, mismatchLimit, buffer, table);
+}
+
+
+void computingFrequenciesWithMismatches(const char* text, uint64_t textLen, int k, int d, int* freqArray)
+{
+	memset(freqArray, 0, sizeof(int)*(0x1 < (2*k)));
+	int ts = 1 << (2*k);
+	int* m = new int[ts];
+	for(int i=0;i<=textLen-k;i++)
+	{
+		memset(m, 0, sizeof(int)*ts);
+		generateSimilar(text+i, k, d, m);
+		for(int i=0;i<ts;i++)
+			freqArray[i]+=m[i];
+	}
+	delete[] m;
+}
+
+
+/*
+ * return the kmers( that differ with count d) with maxcount
+ */
+
+int* freqArray(int k)
+{
+	int freqArraySize = 1 << (2*k);
+	int* freqArray = new int[freqArraySize];
+	memset(freqArray, 0, sizeof(int)*freqArraySize);
+	return freqArray;
+}
+
+
+
+void readLineFedInput(string& input, istream& stream)
+{
+	string s;
+	while(getline(stream, s))
+	{
+		for(char c : s)
+		{
+			if(c!='\n' && c!='\r')
+				input += c;
+		}
+	}
+}
+
+void validateInput(const string& s)
+{
+	for(int i=0;i<s.size();i++)
+	{
+		char c = s[i];
+		switch(c)
+		{
+		case 'A':
+		case 'C':
+		case 'G':
+		case 'T':
+			break;
+		default:
+			cout << "Invalid character: " << c << " at: " << i << endl;
+			while(1);
+		}
+	}
+}
 
 
 
@@ -562,6 +691,77 @@ public:
 		return res;
 	}
 
+	pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text, uint64_t size, int k, int d, bool reverseIncluded)
+	{
+		int freqArraySize = 1 << (2*k);
+		int* fa = freqArray(k);
+		computingFrequenciesWithMismatches(text, size, k, d, fa);
+		int maxLoc = 0;
+		vector<string> r;
+		if(!reverseIncluded)
+		{
+			for(int i=0;i<freqArraySize;i++)
+			{
+				int f = fa[i];
+				if(f > maxLoc)
+					maxLoc = f;
+			}
+			for(int i=0;i<freqArraySize;i++)
+			{
+				if(maxLoc == fa[i])
+				{
+					r.push_back(numToPattern(i, k));
+				}
+			}
+		}
+		else
+		{
+			int* nfa = freqArray(k);
+			bool* processed = new bool[freqArraySize];
+			memset(processed, 0, sizeof(bool) * freqArraySize);
+			for(int i=0;i<freqArraySize;i++)
+			{
+				if(!processed[i])
+				{
+					int g = fa[i];
+					int reverseLoc = patternToNumber(reverseComplement(numToPattern(i, k)).c_str(), k);
+					int h = fa[reverseLoc];
+					nfa[i] = g+h;
+					nfa[reverseLoc] = g+h;
+					processed[i] = true;
+					processed[reverseLoc] = true;
+
+					if(g+h > maxLoc)
+						maxLoc = g+h;
+				}
+			}
+
+			for(int i=0;i<freqArraySize;i++)
+			{
+				if(nfa[i] == maxLoc)
+				{
+					r.push_back(numToPattern(i, k));
+				}
+			}
+
+			delete[] nfa;
+			delete[] processed;
+		}
+		delete[] fa;
+
+		return make_pair(r, maxLoc);
+
+	}
+
+
+	vector<string> findDnaBoxCandidates(int k, int d, int windowSizeBefore, int windowSizeAfter)
+	{
+		vector<int> skews = minimumSkew();
+		auto res = findMostFreqKmersWithMismatches(_genome.c_str() + skews[0] - windowSizeBefore, windowSizeBefore + windowSizeAfter, k, d, true);
+		return res.first;
+	}
+
+
 	size_t size() const
 	{
 		return _genome.size();
@@ -582,197 +782,37 @@ private:
 };
 
 
-static char nucleos[] = {'A', 'C', 'G', 'T'};
 
-int hammingDistance(const char* s1, const char* s2, int len)
+
+unordered_set<string> commonSet(const vector<vector<string>> candidateSets)
 {
-	int diff = 0;
-	for(int i=0;i<len;i++)
+	unordered_set<string> common;
+	for(int i=0;i<candidateSets.size();i++)
 	{
-		if(*s1++!=*s2++)
-			diff++;
-	}
-	return diff;
-}
-
-vector<uint64_t> approximatePatternMatch(const char* pattern, int patternLen, const char* text, int textLen, int mismatchLimit)
-{
-	if(patternLen > textLen)
-		return vector<uint64_t>();
-
-	int k = patternLen;
-	const char* textEnd = text+textLen;
-
-	vector<uint64_t> res;
-	for(const char* t=text;t<textEnd;t++)
-	{
-		if(hammingDistance(t, pattern, patternLen) <= mismatchLimit)
+		const vector<string>& se = candidateSets[i];
+		for(const string& s : se)
 		{
-			res.push_back(t - text);
-		}
-	}
-
-	return res;
-}
-
-uint32_t approximatePatternCount(const char* pattern, int patternLen, const char* text, int textLen, int mismatchLimit)
-{
-	auto res =  approximatePatternMatch(pattern, patternLen, text, textLen, mismatchLimit);
-	return res.size();
-}
-
-
-static void _generateSimilar(const char* pattern, int patternLen, int pos, int l, int mismatchLimit, char* buffer, int* table)
-{
-	if(pos == patternLen || l > mismatchLimit)
-	{
-		return;
-	}
-	for(int p=pos;p<patternLen;p++)
-	{
-		char c = pattern[p];
-		for(int i=0;i<4;i++)
-		{
-			buffer[p] = nucleos[i];
-			table[patternToNumber(buffer, patternLen)] = 1;
-			_generateSimilar(pattern, patternLen, pos+1, l+1, mismatchLimit, buffer, table);
-		}
-		buffer[p] = c;
-	}
-
-}
-
-void generateSimilar(const char* pattern, int patternLen, int mismatchLimit, int* table)
-{
-	char* buffer = new char[patternLen];
-	memcpy(buffer, pattern, patternLen);
-	table[patternToNumber(buffer, patternLen)] = 1;
-	_generateSimilar(pattern, patternLen, 0, 1, mismatchLimit, buffer, table);
-}
-
-
-void computingFrequenciesWithMismatches(const char* text, uint64_t textLen, int k, int d, int* freqArray)
-{
-	memset(freqArray, 0, sizeof(int)*(0x1 < (2*k)));
-	int ts = 1 << (2*k);
-	int* m = new int[ts];
-	for(int i=0;i<=textLen-k;i++)
-	{
-		memset(m, 0, sizeof(int)*ts);
-		generateSimilar(text+i, k, d, m);
-		for(int i=0;i<ts;i++)
-			freqArray[i]+=m[i];
-	}
-	delete[] m;
-}
-
-
-/*
- * return the kmers( that differ with count d) with maxcount
- */
-
-int* freqArray(int k)
-{
-	int freqArraySize = 1 << (2*k);
-	int* freqArray = new int[freqArraySize];
-	memset(freqArray, 0, sizeof(int)*freqArraySize);
-	return freqArray;
-}
-
-pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text, uint64_t size, int k, int d, bool reverseIncluded)
-{
-	int freqArraySize = 1 << (2*k);
-	int* fa = freqArray(k);
-	computingFrequenciesWithMismatches(text, size, k, d, fa);
-	int maxLoc = 0;
-	vector<string> r;
-	if(!reverseIncluded)
-	{
-		for(int i=0;i<freqArraySize;i++)
-		{
-			int f = fa[i];
-			if(f > maxLoc)
-				maxLoc = f;
-		}
-		for(int i=0;i<freqArraySize;i++)
-		{
-			if(maxLoc == fa[i])
+			bool inAll = true;
+			for(int j=i+1;j<candidateSets.size();j++)
 			{
-				r.push_back(numToPattern(i, k));
+				const vector<string>& hh = candidateSets[j];
+				if(find(hh.begin(), hh.end(), s) == hh.end())
+				{
+					inAll = false;
+					break;
+				}
 			}
+			if( (inAll && i!=candidateSets.size()-1) || (inAll && candidateSets.size()==1))
+				common.insert(s);
 		}
 	}
-	else
-	{
-		int* nfa = freqArray(k);
-		bool* processed = new bool[freqArraySize];
-		memset(processed, 0, sizeof(bool) * freqArraySize);
-		for(int i=0;i<freqArraySize;i++)
-		{
-			if(!processed[i])
-			{
-				int g = fa[i];
-				int reverseLoc = patternToNumber(reverseComplement(numToPattern(i, k)).c_str(), k);
-				int h = fa[reverseLoc];
-				nfa[i] = g+h;
-				nfa[reverseLoc] = g+h;
-				processed[i] = true;
-				processed[reverseLoc] = true;
-
-				if(g+h > maxLoc)
-					maxLoc = g+h;
-			}
-		}
-
-		for(int i=0;i<freqArraySize;i++)
-		{
-			if(nfa[i] == maxLoc)
-			{
-				r.push_back(numToPattern(i, k));
-			}
-		}
-
-		delete[] nfa;
-		delete[] processed;
-	}
-	delete[] fa;
-
-	return make_pair(r, maxLoc);
-
+	return common;
 }
 
 
-
-
-/*
- *
-
- *
- */
 
 int main()
 {
-	string text;
-	//string text2;
-	getline(cin, text);
-	int k = 9;
-	int d = 1;
-	//cin >> k >> d;
-	//string pattern =
-	Genome genome(text);
-	ull s1 = rdtsc();
-	vector<int> skews = genome.minimumSkew();
-	ull s2 = rdtsc();
-	auto res = findMostFreqKmersWithMismatches(text.c_str() + skews[0], 500, k, d, true);
-	ull s3 = rdtsc();
-	cout << "count: " << res.second << "\n";
-	for(string& s : res.first)
-	{
-		cout << s << " ";
-	}
-	cout << "Finished microsecs: " << ((s3-s1) / avgCyclesPerMicroSec) << endl;
-	cout << "Finding skews: " << (s2 - s1) / avgCyclesPerMicroSec << " finding kmers: " << (s3 - s2)/avgCyclesPerMicroSec << endl;
-
 	return 0;
 }
 

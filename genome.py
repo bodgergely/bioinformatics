@@ -4,6 +4,8 @@ import math
 import time
 from matplotlib import pyplot as plt
 import sys
+from docutils.nodes import row
+from sympy.interactive.tests.test_ipython import readline
 
 def offset(c, pos):
     alphabet = ['A', 'C', 'G', 'T']
@@ -82,15 +84,43 @@ def plot(rows):
     plt.show()
 
 
-def readFile(file):
+def readSkew(file):
     f = open(file, 'r')
     rows = []
     for l in f:
         rows.append(int(l))
+    f.close()
     return rows
 
-rows = readFile(sys.argv[1])
-plot(rows)
+def readLines(file):
+    res = ""
+    with open(file, 'r') as f:
+        for line in f:
+           res+=line
+    return res 
+
+
+def fromTo(row, start, end):
+    s = ""
+    return row[start:end]
+
+
+def skewPlot(fileName):
+    rows = readSkew(sys.argv[1])
+    plot(rows)
+    
+
+#skewPlot(sys.argv[1])
+
+
+start = 3818639
+line = readLines(sys.argv[1])
+print len(line)
+part = fromTo(line, int(sys.argv[2]), int(sys.argv[2]) + int(sys.argv[3]))
+print len(part)
+f = open(sys.argv[4], "w")
+f.write(part)
+
 
 """
 import sys
