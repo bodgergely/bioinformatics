@@ -90,6 +90,8 @@ vector<string> mostFrequentWords_N2(const string& text, int k)
 			res.push_back(mfs[i]);
 	}
 
+	delete[] count;
+
 	return res;
 }
 
@@ -192,7 +194,7 @@ vector<string> freqArray(const string& text, int k)
 
 	//cout << "Frequency array: " << endl;
 	//printFreqArray(array, kmerCount);
-
+	delete[] array;
 	return res;
 }
 
@@ -334,6 +336,77 @@ vector<measures> competition()
 }
 
 
+pair<vector<string>, int> findMostFreqKmers(const char* start, uint64_t size, int k)
+{
+	vector<int> coded;
+	const char* text = start;
+	coded.reserve(size-k+1);
+	for(int i=0;i<size-k + 1;i++)
+	{
+		int loc = patternToNumber(text+i, k);
+		coded.push_back(loc);
+	}
+
+	//ull s = rdtsc();
+	sort(coded.begin(), coded.end());
+	//ull e = rdtsc();
+	//printf("coded size: %lu sort took: %f\n", coded.size(), (e - s)/ avgCyclesPerMicroSec);
+
+	vector<int> maxLocs;
+	int prev = coded[0];
+	int maxc = 1;
+	int counter = 1;
+	int currLoc = 0;
+	for(int i=1;i<coded.size();i++)
+	{
+		if(coded[i]!=prev)
+		{
+			if(counter > maxc)
+			{
+				maxc = counter;
+				maxLocs.clear();
+				maxLocs.push_back(coded[currLoc]);
+			}
+			else if(counter == maxc)
+			{
+				maxLocs.push_back(coded[currLoc]);
+			}
+			currLoc = i;
+			counter = 1;
+			prev = coded[i];
+		}
+		else
+		{
+			counter++;
+		}
+	}
+
+	vector<string> res;
+	for(int l : maxLocs)
+	{
+		res.push_back(numToPattern(l, k));
+	}
+
+	return make_pair(res, maxc);
+
+}
+
+
+
+vector<uint64_t> findOccurences(const char* pattern, int patternLen, const char* text, uint64_t textLen)
+{
+	vector<uint64_t> occurences;
+	int k = patternLen;
+	for(uint64_t i=0;i<textLen - k + 1;i++)
+	{
+		if(!memcmp(text + i, pattern, k))
+			occurences.push_back(i);
+	}
+	return occurences;
+}
+
+
+
 
 class Genome
 {
@@ -345,75 +418,11 @@ public:
 		_nucleoLookup['G'] = 2;
 		_nucleoLookup['T'] = 3;
 	}
-	pair<vector<string>, int> findMostFreqKmers(int k)
+	pair<vector<string>, int> findMostFreqKmers(int k) const
 	{
-		return findMostFreqKmers(_genome.c_str(), _genome.size(), k);
+		return ::findMostFreqKmers(_genome.c_str(), _genome.size(), k);
 	}
-	pair<vector<string>, int> findMostFreqKmers(const char* start, int size, int k)
-	{
-		vector<int> coded;
-		const char* text = start;
-		coded.reserve(size-k+1);
-		for(int i=0;i<size-k + 1;i++)
-		{
-			int loc = patternToNumber(text+i, k);
-			coded.push_back(loc);
-		}
 
-		//ull s = rdtsc();
-		sort(coded.begin(), coded.end());
-		//ull e = rdtsc();
-		//printf("coded size: %lu sort took: %f\n", coded.size(), (e - s)/ avgCyclesPerMicroSec);
-
-		vector<int> maxLocs;
-		int prev = coded[0];
-		int maxc = 1;
-		int counter = 1;
-		int currLoc = 0;
-		for(int i=1;i<coded.size();i++)
-		{
-			if(coded[i]!=prev)
-			{
-				if(counter > maxc)
-				{
-					maxc = counter;
-					maxLocs.clear();
-					maxLocs.push_back(coded[currLoc]);
-				}
-				else if(counter == maxc)
-				{
-					maxLocs.push_back(coded[currLoc]);
-				}
-				currLoc = i;
-				counter = 1;
-				prev = coded[i];
-			}
-			else
-			{
-				counter++;
-			}
-		}
-
-		vector<string> res;
-		for(int l : maxLocs)
-		{
-			res.push_back(numToPattern(l, k));
-		}
-
-		return make_pair(res, maxc);
-
-	}
-	vector<int> findOccurences(const string& pattern)
-	{
-		vector<int> occurences;
-		int k = pattern.size();
-		for(int i=0;i<_genome.size() - k + 1;i++)
-		{
-			if(!memcmp(_genome.c_str() + i, pattern.c_str(), k))
-				occurences.push_back(i);
-		}
-		return occurences;
-	}
 
 	vector<string> clumpsNaive(int k, int L, int t)
 	{
@@ -457,14 +466,19 @@ public:
 
 		return res;
 	}
-	vector<string> clumps(int k, int L, int t)
+	vector<string> clumps(int k, int L, int t, uint64_t searchwindowSize=0, uint64_t startpos=0)
 	{
+		if(searchwindowSize == 0)
+			searchwindowSize = _genome.size();
 
 		int  kmerCount = (0x01 << (k*2));
 		char* clump = new char[kmerCount];
 		memset(clump, 0, sizeof(char) * kmerCount);
-		int genomeSize = _genome.size();
-		const char* text = _genome.c_str();
+		uint64_t end = searchwindowSize;
+		const char* text = _genome.c_str() + startpos;
+
+		if(startpos + searchwindowSize > _genome.size())
+			searchwindowSize = _genome.size() - startpos;
 
 		int* temp = new int[kmerCount];
 		memset(temp, 0, sizeof(int) * kmerCount);
@@ -483,7 +497,7 @@ public:
 			prevLoc = loc;
 		}
 
-		for(int i=1;i<genomeSize-L+1;i++)
+		for(int i=1;i<end-L+1;i++)
 		{
 			temp[backLoc]--;
 			backLoc = fastNextPos(backLoc, k, _nucleoLookup[text[i + k - 1]]);
@@ -492,6 +506,8 @@ public:
 			if(temp[prevLoc] >= t)
 				clump[prevLoc] = 1;
 		}
+
+		delete[] temp;
 
 		vector<string> res;
 		for(int i=0;i<kmerCount;i++)
@@ -566,28 +582,196 @@ private:
 };
 
 
+static char nucleos[] = {'A', 'C', 'G', 'T'};
 
+int hammingDistance(const char* s1, const char* s2, int len)
+{
+	int diff = 0;
+	for(int i=0;i<len;i++)
+	{
+		if(*s1++!=*s2++)
+			diff++;
+	}
+	return diff;
+}
+
+vector<uint64_t> approximatePatternMatch(const char* pattern, int patternLen, const char* text, int textLen, int mismatchLimit)
+{
+	if(patternLen > textLen)
+		return vector<uint64_t>();
+
+	int k = patternLen;
+	const char* textEnd = text+textLen;
+
+	vector<uint64_t> res;
+	for(const char* t=text;t<textEnd;t++)
+	{
+		if(hammingDistance(t, pattern, patternLen) <= mismatchLimit)
+		{
+			res.push_back(t - text);
+		}
+	}
+
+	return res;
+}
+
+uint32_t approximatePatternCount(const char* pattern, int patternLen, const char* text, int textLen, int mismatchLimit)
+{
+	auto res =  approximatePatternMatch(pattern, patternLen, text, textLen, mismatchLimit);
+	return res.size();
+}
+
+
+static void _generateSimilar(const char* pattern, int patternLen, int pos, int l, int mismatchLimit, char* buffer, int* table)
+{
+	if(pos == patternLen || l > mismatchLimit)
+	{
+		return;
+	}
+	for(int p=pos;p<patternLen;p++)
+	{
+		char c = pattern[p];
+		for(int i=0;i<4;i++)
+		{
+			buffer[p] = nucleos[i];
+			table[patternToNumber(buffer, patternLen)] = 1;
+			_generateSimilar(pattern, patternLen, pos+1, l+1, mismatchLimit, buffer, table);
+		}
+		buffer[p] = c;
+	}
+
+}
+
+void generateSimilar(const char* pattern, int patternLen, int mismatchLimit, int* table)
+{
+	char* buffer = new char[patternLen];
+	memcpy(buffer, pattern, patternLen);
+	table[patternToNumber(buffer, patternLen)] = 1;
+	_generateSimilar(pattern, patternLen, 0, 1, mismatchLimit, buffer, table);
+}
+
+
+void computingFrequenciesWithMismatches(const char* text, uint64_t textLen, int k, int d, int* freqArray)
+{
+	memset(freqArray, 0, sizeof(int)*(0x1 < (2*k)));
+	int ts = 1 << (2*k);
+	int* m = new int[ts];
+	for(int i=0;i<=textLen-k;i++)
+	{
+		memset(m, 0, sizeof(int)*ts);
+		generateSimilar(text+i, k, d, m);
+		for(int i=0;i<ts;i++)
+			freqArray[i]+=m[i];
+	}
+	delete[] m;
+}
+
+
+/*
+ * return the kmers( that differ with count d) with maxcount
+ */
+
+int* freqArray(int k)
+{
+	int freqArraySize = 1 << (2*k);
+	int* freqArray = new int[freqArraySize];
+	memset(freqArray, 0, sizeof(int)*freqArraySize);
+	return freqArray;
+}
+
+pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text, uint64_t size, int k, int d, bool reverseIncluded)
+{
+	int freqArraySize = 1 << (2*k);
+	int* fa = freqArray(k);
+	computingFrequenciesWithMismatches(text, size, k, d, fa);
+	int maxLoc = 0;
+	vector<string> r;
+	if(!reverseIncluded)
+	{
+		for(int i=0;i<freqArraySize;i++)
+		{
+			int f = fa[i];
+			if(f > maxLoc)
+				maxLoc = f;
+		}
+		for(int i=0;i<freqArraySize;i++)
+		{
+			if(maxLoc == fa[i])
+			{
+				r.push_back(numToPattern(i, k));
+			}
+		}
+	}
+	else
+	{
+		int* nfa = freqArray(k);
+		bool* processed = new bool[freqArraySize];
+		memset(processed, 0, sizeof(bool) * freqArraySize);
+		for(int i=0;i<freqArraySize;i++)
+		{
+			if(!processed[i])
+			{
+				int g = fa[i];
+				int reverseLoc = patternToNumber(reverseComplement(numToPattern(i, k)).c_str(), k);
+				int h = fa[reverseLoc];
+				nfa[i] = g+h;
+				nfa[reverseLoc] = g+h;
+				processed[i] = true;
+				processed[reverseLoc] = true;
+
+				if(g+h > maxLoc)
+					maxLoc = g+h;
+			}
+		}
+
+		for(int i=0;i<freqArraySize;i++)
+		{
+			if(nfa[i] == maxLoc)
+			{
+				r.push_back(numToPattern(i, k));
+			}
+		}
+
+		delete[] nfa;
+		delete[] processed;
+	}
+	delete[] fa;
+
+	return make_pair(r, maxLoc);
+
+}
+
+
+
+
+/*
+ *
+
+ *
+ */
 
 int main()
 {
 	string text;
-	//string pattern = "TAAAGACTGCCGAGAGGCCAACACGAGTGCTAGAACGAGGGGCGTAAACGCGGGTCCGAT";
-	//getline(std::cin, pattern);
-	getline(std::cin, text);
-	//int k;
-	//int L;
-	//int t;
-	//cin >> k >> L >> t;
-
+	//string text2;
+	getline(cin, text);
+	int k = 9;
+	int d = 1;
+	//cin >> k >> d;
+	//string pattern =
 	Genome genome(text);
-	auto res = genome.minimumSkew();
-	for(int i=0;i<res.size();i++)
+	ull s1 = rdtsc();
+	vector<int> skews = genome.minimumSkew();
+	ull s2 = rdtsc();
+	auto res = findMostFreqKmersWithMismatches(text.c_str() + skews[0], 500, k, d, true);
+	ull s3 = rdtsc();
+	cout << "count: " << res.second << "\n";
+	for(string& s : res.first)
 	{
-		cout << res[i];
-		if(i<res.size()-1)
-			cout << " ";
+		cout << s << " ";
 	}
-	cout << "\n";
+	cout << "Finished microsecs: " << ((s3-s1) / avgCyclesPerMicroSec) << endl;
+	cout << "Finding skews: " << (s2 - s1) / avgCyclesPerMicroSec << " finding kmers: " << (s3 - s2)/avgCyclesPerMicroSec << endl;
 
 	return 0;
 }
