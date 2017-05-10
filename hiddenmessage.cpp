@@ -63,6 +63,20 @@ string reverseComplement(const string& s)
 	return r;
 }
 
+/*
+ * return the kmers( that differ with count d) with maxcount
+ */
+
+int* freqArray(int k)
+{
+	int freqArraySize = 1 << (2*k);
+	int* freqArray = new int[freqArraySize];
+	memset(freqArray, 0, sizeof(int)*freqArraySize);
+	return freqArray;
+}
+
+
+
 vector<string> mostFrequentWords_N2(const string& text, int k)
 {
 	int* count = new int[text.size() - k + 1];
@@ -167,7 +181,7 @@ void printFreqArray(int* array, int size)
 	//cout << "\n";
 }
 
-vector<string> freqArray(const string& text, int k)
+vector<string> freqArrayTable(const string& text, int k)
 {
 	int  kmerCount = (0x01 << (k*2));
 	int* array = new int[kmerCount];
@@ -472,6 +486,27 @@ void generateSimilar(const char* pattern, int patternLen, int mismatchLimit, int
 	_generateSimilar(pattern, patternLen, 0, 1, mismatchLimit, buffer, table);
 }
 
+vector<string> generateSimilar(const char* pattern, int patternLen, int mismatchLimit)
+{
+	int* table = freqArray(patternLen);
+	int tableSize = 1 << (2*patternLen);
+	char* buffer = new char[patternLen];
+	memcpy(buffer, pattern, patternLen);
+	table[patternToNumber(buffer, patternLen)] = 1;
+	_generateSimilar(pattern, patternLen, 0, 1, mismatchLimit, buffer, table);
+
+	vector<string> res;
+	for(int i=0;i<tableSize;i++)
+	{
+		if(table[i])
+			res.push_back(numToPattern(i, patternLen));
+	}
+	delete[] buffer;
+	delete[] table;
+
+	return res;
+}
+
 
 void computingFrequenciesWithMismatches(const char* text, uint64_t textLen, int k, int d, int* freqArray)
 {
@@ -488,18 +523,6 @@ void computingFrequenciesWithMismatches(const char* text, uint64_t textLen, int 
 	delete[] m;
 }
 
-
-/*
- * return the kmers( that differ with count d) with maxcount
- */
-
-int* freqArray(int k)
-{
-	int freqArraySize = 1 << (2*k);
-	int* freqArray = new int[freqArraySize];
-	memset(freqArray, 0, sizeof(int)*freqArraySize);
-	return freqArray;
-}
 
 
 
@@ -809,10 +832,228 @@ unordered_set<string> commonSet(const vector<vector<string>> candidateSets)
 	return common;
 }
 
+const char* find(const char* where, size_t whereLen, const char* what, size_t whatLen)
+{
+	const char* end = where + whereLen;
+	const char* curr = where;
+	while(curr + whatLen - 1 < end)
+	{
+		if(!memcmp(what, curr, whatLen))
+		{
+			return curr;
+		}
+		curr++;
+	}
+
+	return NULL;
+}
+
+
+
+
+
+class Motif
+{
+public:
+
+	template<class T>
+	struct nucleofreq
+	{
+		nucleofreq() {memset(t, 0, sizeof(T)*4);}
+		T t[4];
+	};
+
+	/*
+	 * complexity:
+	 * O(numberOfDNAs * dnaLength * numOfPatternSimilar * numOfPatternSimilar * numberOfDNAs)
+	 */
+	static unordered_set<string> motifEnumeration(vector<string> dnaSet, int k, int d)
+	{
+		unordered_set<string> solution;
+
+		for(const string& dna : dnaSet)
+		{
+			for(int i=0;i<=dna.size()-k+1;i++)
+			{
+				vector<string> patterns = generateSimilar(dna.c_str() + i, k, d);
+				for(const string& p : patterns)
+				{
+					vector<string> pvars = generateSimilar(p.c_str(), k, d);
+					bool present = true;
+					for(const string& d : dnaSet)
+					{
+						bool pp = false;
+						for(const string& pvar : pvars)
+						{
+							if(find(d.c_str(), d.size(), pvar.c_str(), pvar.size()))
+							{
+								pp = true;
+								break;
+							}
+						}
+						if(!pp)
+						{
+							present  = false;
+						}
+					}
+					if(present)
+					{
+						solution.insert(p);
+					}
+				}
+			}
+		}
+
+		return solution;
+	}
+	static double entropy(const vector<double>& probs)
+	{
+		double acc = 0;
+		for(double p : probs)
+		{
+			if(p!=0.0)
+			{
+				acc += p * log2l(p);
+			}
+		}
+		return acc;
+	}
+
+	static vector<nucleofreq<int>> scoreMatrix(const vector<string>& matrix)
+	{
+		char nucleoLookup[256];
+		nucleoLookup['A'] = 0;
+		nucleoLookup['C'] = 1;
+		nucleoLookup['G'] = 2;
+		nucleoLookup['T'] = 3;
+		int len = matrix[0].size();
+		vector<nucleofreq<int>> freqs(len);
+		for(int c=0;c<len;c++)
+		{
+			nucleofreq<int> nf;
+			for(const string& s : matrix)
+			{
+				nf.t[nucleoLookup[s[c]]]++;
+			}
+			freqs[c] = nf;
+		}
+		return freqs;
+	}
+
+	static vector<double> entropyMatrix(const vector<string>& matrix)
+	{
+		vector<nucleofreq<int>> counts = scoreMatrix(matrix);
+
+		vector<double> entropies;
+		for(int i=0;i<matrix.size();i++)
+		{
+			vector<double> probs;
+			for(int j=0;j<4;j++)
+			{
+				probs.push_back(counts[i].t[j] / (double)matrix.size());
+			}
+			entropies.push_back(entropy(probs));
+		}
+
+		return entropies;
+	}
+
+	static string consensus(const vector<string>& matrix)
+	{
+		static char nucleosLookup[] = {'A', 'C', 'G', 'T'};
+		vector<nucleofreq<int>> counts = scoreMatrix(matrix);
+		string consensus = "";
+		for(int i=0;i<matrix.size();i++)
+		{
+			int maxidx = 0;
+			int max = 0;
+			for(int j=0;j<4;j++)
+			{
+				if(counts[i].t[j] > max)
+				{
+					max = counts[i].t[j];
+					maxidx = j;
+				}
+			}
+			consensus.push_back(nucleosLookup[maxidx]);
+		}
+
+		return consensus;
+	}
+
+	static vector<string> bruteForceMotifSearch(vector<string> dna)
+	{
+		for(const string& s : dna)
+		{
+
+		}
+	}
+
+
+	static int distance(const string& pattern, const string& text)
+	{
+		int k = pattern.size();
+		int min = 0;
+		for(int i=0;i<=text.size()-k;i++)
+		{
+			//cout << "Iter: " << i << endl;
+			int d = hammingDistance(pattern.c_str(), text.c_str() + i, k);
+			if(d < min || i == 0)
+			{
+				min = d;
+			}
+		}
+		return min;
+	}
+
+	static int distance(const string& pattern, const vector<string>& dna)
+	{
+		int sum = 0;
+		for(const string& t : dna)
+		{
+			sum+=distance(pattern, t);
+		}
+		return sum;
+	}
+
+	static string medianString(const vector<string>& dna, int k)
+	{
+		string candidate = "";
+		int min = 0;
+		for(int i=0;i < (1 << 2*k);i++)
+		{
+			string pattern = numToPattern(i, k);
+			int c = distance(pattern, dna);
+			if(c < min || i==0)
+			{
+				min = c;
+				candidate = pattern;
+			}
+
+		}
+		return candidate;
+	}
+
+};
+
 
 
 int main()
 {
+
+	int  k;
+	cin >> k;
+	vector<string> dna;
+	string text;
+	getline(cin, text);
+	while(getline(cin, text))
+	{
+		dna.push_back(text);
+	}
+
+	string median = Motif::medianString(dna, k);
+	cout << median << endl;
+
 	return 0;
 }
 
