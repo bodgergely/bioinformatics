@@ -19,7 +19,7 @@
 
 using namespace std;
 
-double avgCyclesPerMicroSec = 2394.74;
+double avgCyclesPerMicroSec = 2905.74;
 
 int patternCount(const string& text, const char* pattern, int plen)
 {
@@ -222,9 +222,9 @@ vector<string> freqArraySorted(const string& text, int k)
 		coded.push_back(loc);
 	}
 
-	//ull s = rdtsc();
+	//ull s = __rdtsc();
 	sort(coded.begin(), coded.end());
-	//ull e = rdtsc();
+	//ull e = __rdtsc();
 	//printf("coded size: %lu sort took: %f\n", coded.size(), (e - s)/ avgCyclesPerMicroSec);
 
 	vector<int> maxLocs;
@@ -301,9 +301,9 @@ typedef vector<string> (*freq)(const string& text, int k) ;
 
 double measure(freq fun, const string& text, int k)
 {
-	ull s = rdtsc();
+	ull s = __rdtsc();
 	fun(text, k);
-	ull e = rdtsc();
+	ull e = __rdtsc();
 	return (e-s)/ float(avgCyclesPerMicroSec);
 }
 
@@ -352,6 +352,7 @@ vector<measures> competition()
 
 pair<vector<string>, int> findMostFreqKmers(const char* start, uint64_t size, int k)
 {
+	// idea: code the patterns and sort the coded patterns and count them and return the max counted pattern(s) and the number of times that(those) patterns are in the genome
 	vector<int> coded;
 	const char* text = start;
 	coded.reserve(size-k+1);
@@ -361,11 +362,12 @@ pair<vector<string>, int> findMostFreqKmers(const char* start, uint64_t size, in
 		coded.push_back(loc);
 	}
 
-	//ull s = rdtsc();
+	//ull s = __rdtsc();
 	sort(coded.begin(), coded.end());
-	//ull e = rdtsc();
+	//ull e = __rdtsc();
 	//printf("coded size: %lu sort took: %f\n", coded.size(), (e - s)/ avgCyclesPerMicroSec);
 
+	// now the coded vector is sorted and contains the coded patterns, iterate over it and since it is sorted easy to count the patterns
 	vector<int> maxLocs;
 	int prev = coded[0];
 	int maxc = 1;
@@ -391,6 +393,7 @@ pair<vector<string>, int> findMostFreqKmers(const char* start, uint64_t size, in
 		}
 		else
 		{
+			// if still the same, count it
 			counter++;
 		}
 	}
@@ -1037,24 +1040,47 @@ public:
 };
 
 
+vector<string> readfile(const string& filename)
+{
+	vector<string> res;
+	ifstream f(filename);
+	if(f.is_open())
+	{
+		string buf;
+		while(getline(f, buf))
+		{
+			res.push_back(buf);
+		}
+	}
+	return res;
+}
+
+int Count(string& text, string& pattern)
+{
+	size_t textlen = text.size();
+	size_t patternlen = pattern.size();
+	int c = 0;
+	for(int i=0;i<textlen - patternlen + 1;i++)
+	{
+		if(string(text.begin()+i, text.begin()+i+patternlen) == pattern)
+		{
+			c++;
+		}
+	}
+	return c;
+}
 
 int main()
 {
-
-	int  k;
-	cin >> k;
-	vector<string> dna;
 	string text;
-	getline(cin, text);
-	while(getline(cin, text))
+	cin >> text;
+	Genome vibrio(text);
+	auto res = vibrio.findMostFreqKmers(9);
+	for(string& s : res.first)
 	{
-		dna.push_back(text);
+		cout << s << endl;
 	}
-
-	string median = Motif::medianString(dna, k);
-	cout << median << endl;
-
-	return 0;
+	cout << res.second << endl;
 }
 
 

@@ -1,11 +1,11 @@
-
+#!python
 
 import math
 import time
 from matplotlib import pyplot as plt
 import sys
 from docutils.nodes import row
-from sympy.interactive.tests.test_ipython import readline
+#from sympy.interactive.tests.test_ipython import readline
 
 def offset(c, pos):
     alphabet = ['A', 'C', 'G', 'T']
@@ -36,7 +36,7 @@ def numToPattern(pos, k):
     s = ""
     for i in range(k-1, -1, -1):
         t = int(math.pow(4, i))
-        l = f/t
+        l = f//t
         s+=alphabet[l]
         f = f % t;
     return s;
@@ -108,36 +108,10 @@ def fromTo(row, start, end):
 def skewPlot(fileName):
     rows = readSkew(sys.argv[1])
     plot(rows)
-    
-
-#skewPlot(sys.argv[1])
 
 
-start = 3818639
-line = readLines(sys.argv[1])
-print len(line)
-part = fromTo(line, int(sys.argv[2]), int(sys.argv[2]) + int(sys.argv[3]))
-print len(part)
-f = open(sys.argv[4], "w")
-f.write(part)
+vibrio = open('genes/Vibrio_cholerae.txt').read()
+vibrio = Genome(vibrio)
+print(vibrio.freqArraySorted(9))
 
-
-"""
-import sys
-
-file = sys.argv[1]
-f = open(file, 'r')
-text = f.read()
-genome = Genome(text)
-start = time.time()
-kmers = genome.freqArraySorted(9)
-end = time.time()
-print "Took secs: " + str((end - start))
-for k in kmers:
-    print k   
-        
-"""     
-        
-        
-        
         

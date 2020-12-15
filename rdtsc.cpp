@@ -10,14 +10,24 @@
 
 #include "rdtsc.h"
 
+
 using namespace std;
 
+#ifdef __gnu_linux__
+#include <unistd.h>
+#elif _WIN32
+#include "Windows.h"
+#endif
 
 unsigned long long estimate_tsc_per_sec()
 {
-	unsigned long long s = rdtsc();
+	unsigned long long s = __rdtsc();
+#ifdef __gnu_linux__
 	usleep(1000000);
-	unsigned long long e = rdtsc();
+#elif _WIN32
+	Sleep(1000);
+#endif
+	unsigned long long e = __rdtsc();
 	return e - s;
 }
 
