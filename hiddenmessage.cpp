@@ -409,7 +409,6 @@ pair<vector<string>, int> findMostFreqKmers(const char* start, uint64_t size, in
 }
 
 
-
 vector<uint64_t> findOccurences(const char* pattern, int patternLen, const char* text, uint64_t textLen)
 {
 	vector<uint64_t> occurences;
@@ -440,7 +439,6 @@ vector<uint64_t> approximatePatternMatch(const char* pattern, int patternLen, co
 	if(patternLen > textLen)
 		return vector<uint64_t>();
 
-	int k = patternLen;
 	const char* textEnd = text+textLen;
 
 	vector<uint64_t> res;
@@ -527,7 +525,67 @@ void computingFrequenciesWithMismatches(const char* text, uint64_t textLen, int 
 }
 
 
+pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text, uint64_t size, int k, int d, bool reverseIncluded)
+{
+	int freqArraySize = 1 << (2*k);
+	int* fa = freqArray(k);
+	computingFrequenciesWithMismatches(text, size, k, d, fa);
+	int maxLoc = 0;
+	vector<string> r;
+	if(!reverseIncluded)
+	{
+		for(int i=0;i<freqArraySize;i++)
+		{
+			int f = fa[i];
+			if(f > maxLoc)
+				maxLoc = f;
+		}
+		for(int i=0;i<freqArraySize;i++)
+		{
+			if(maxLoc == fa[i])
+			{
+				r.push_back(numToPattern(i, k));
+			}
+		}
+	}
+	else
+	{
+		int* nfa = freqArray(k);
+		bool* processed = new bool[freqArraySize];
+		memset(processed, 0, sizeof(bool) * freqArraySize);
+		for(int i=0;i<freqArraySize;i++)
+		{
+			if(!processed[i])
+			{
+				int g = fa[i];
+				int reverseLoc = patternToNumber(reverseComplement(numToPattern(i, k)).c_str(), k);
+				int h = fa[reverseLoc];
+				nfa[i] = g+h;
+				nfa[reverseLoc] = g+h;
+				processed[i] = true;
+				processed[reverseLoc] = true;
 
+				if(g+h > maxLoc)
+					maxLoc = g+h;
+			}
+		}
+
+		for(int i=0;i<freqArraySize;i++)
+		{
+			if(nfa[i] == maxLoc)
+			{
+				r.push_back(numToPattern(i, k));
+			}
+		}
+
+		delete[] nfa;
+		delete[] processed;
+	}
+	delete[] fa;
+
+	return make_pair(r, maxLoc);
+
+}
 
 void readLineFedInput(string& input, istream& stream)
 {
@@ -717,72 +775,13 @@ public:
 		return res;
 	}
 
-	pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text, uint64_t size, int k, int d, bool reverseIncluded)
-	{
-		int freqArraySize = 1 << (2*k);
-		int* fa = freqArray(k);
-		computingFrequenciesWithMismatches(text, size, k, d, fa);
-		int maxLoc = 0;
-		vector<string> r;
-		if(!reverseIncluded)
-		{
-			for(int i=0;i<freqArraySize;i++)
-			{
-				int f = fa[i];
-				if(f > maxLoc)
-					maxLoc = f;
-			}
-			for(int i=0;i<freqArraySize;i++)
-			{
-				if(maxLoc == fa[i])
-				{
-					r.push_back(numToPattern(i, k));
-				}
-			}
-		}
-		else
-		{
-			int* nfa = freqArray(k);
-			bool* processed = new bool[freqArraySize];
-			memset(processed, 0, sizeof(bool) * freqArraySize);
-			for(int i=0;i<freqArraySize;i++)
-			{
-				if(!processed[i])
-				{
-					int g = fa[i];
-					int reverseLoc = patternToNumber(reverseComplement(numToPattern(i, k)).c_str(), k);
-					int h = fa[reverseLoc];
-					nfa[i] = g+h;
-					nfa[reverseLoc] = g+h;
-					processed[i] = true;
-					processed[reverseLoc] = true;
 
-					if(g+h > maxLoc)
-						maxLoc = g+h;
-				}
-			}
-
-			for(int i=0;i<freqArraySize;i++)
-			{
-				if(nfa[i] == maxLoc)
-				{
-					r.push_back(numToPattern(i, k));
-				}
-			}
-
-			delete[] nfa;
-			delete[] processed;
-		}
-		delete[] fa;
-
-		return make_pair(r, maxLoc);
-
-	}
 
 
 	vector<string> findDnaBoxCandidates(int k, int d, int windowSizeBefore, int windowSizeAfter)
 	{
 		vector<int> skews = minimumSkew();
+		// TODO check if argument does not fall out of memory range
 		auto res = findMostFreqKmersWithMismatches(_genome.c_str() + skews[0] - windowSizeBefore, windowSizeBefore + windowSizeAfter, k, d, true);
 		return res.first;
 	}
@@ -984,13 +983,13 @@ public:
 		return consensus;
 	}
 
-	static vector<string> bruteForceMotifSearch(vector<string> dna)
-	{
-		for(const string& s : dna)
-		{
+	// static vector<string> bruteForceMotifSearch(vector<string> dna)
+	// {
+	// 	for(const string& s : dna)
+	// 	{
 
-		}
-	}
+	// 	}
+	// }
 
 
 	static int distance(const string& pattern, const string& text)
@@ -1074,14 +1073,4 @@ int main()
 {
 	string text;
 	cin >> text;
-	Genome vibrio(text);
-	auto res = vibrio.findMostFreqKmers(9);
-	for(string& s : res.first)
-	{
-		cout << s << endl;
-	}
-	cout << res.second << endl;
 }
-
-
-
