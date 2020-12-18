@@ -1,0 +1,3 @@
+alias b=$PWD/build.sh
+alias r=$PWD/build/hiddenmessage
+alias br='b && r'

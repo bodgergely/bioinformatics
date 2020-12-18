@@ -1,0 +1,12 @@
+cell devides:
+- replicates its genome -> each of the 2 daughter cells receive its copy
+
+Complements:
+A - T
+C - G
+
+
+Replication begins in a genomic region called the replication origin (denoted ori) 
+and is carried out by molecular copy machines called DNA polymerases.
+
+How to find the Ori? 

@@ -1,0 +1,2 @@
+set -e
+./build/hiddenmessage

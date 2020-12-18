@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.html": "html",
+        "ostream": "cpp",
+        "string": "cpp",
+        "utility": "cpp"
+    },
+    "files.exclude": {
+        "**/.*": true,
+        "**/*.pyc": true,
+        "**/*.sln": true,
+        "**/*.vcxproj*": true
+    }
+}
