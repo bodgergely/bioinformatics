@@ -110,8 +110,34 @@ def skewPlot(fileName):
     plot(rows)
 
 
-vibrio = open('genes/Vibrio_cholerae.txt').read()
-vibrio = Genome(vibrio)
-print(vibrio.freqArraySorted(9))
+def mostFrequentWords(text, k):
+    table = {}
+    n = len(text)
+    for i in range(0, n-k+1):
+        pattern = text[i:i+k]
+        if pattern not in table:
+            table[pattern] = 1
+        else:
+            table[pattern] += 1
+    maxSeen = 0
+    res = []
+    for pat, pc in table.items():
+        if pc > maxSeen:
+            res.clear()
+            maxSeen = pc
+            res.append(pat)
+        elif pc == maxSeen:
+            res.append(pat)
+        else:
+            pass
+    return res 
 
-        
+
+inp = [l for l in sys.stdin]
+text = inp[0]
+k = int(inp[1])
+
+for l in mostFrequentWords(text, k):
+    print(l)
+
+

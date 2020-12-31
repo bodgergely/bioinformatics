@@ -63,9 +63,6 @@ string reverseComplement(const string& s)
 	return r;
 }
 
-/*
- * return the kmers( that differ with count d) with maxcount
- */
 
 int* freqArray(int k)
 {
@@ -524,7 +521,9 @@ void computingFrequenciesWithMismatches(const char* text, uint64_t textLen, int 
 	delete[] m;
 }
 
-
+/*
+ * return the kmers( that differ with count d) with maxcount
+ */
 pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text, uint64_t size, int k, int d, bool reverseIncluded)
 {
 	int freqArraySize = 1 << (2*k);
@@ -1068,6 +1067,30 @@ int Count(string& text, string& pattern)
 	}
 	return c;
 }
+
+
+
+
+
+
+
+
+/*
+****************************
+	Scratchpad
+*****************************
+*/
+
+vector<string> mostFrequentWords(string text, int k)
+{
+		
+}
+
+
+
+
+
+
 
 int main()
 {
