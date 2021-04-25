@@ -1,3 +1,3 @@
 alias b=$PWD/build.sh
-alias r=$PWD/build/hiddenmessage
+alias r='cat input.txt | $PWD/build/hiddenmessage'
 alias br='b && r'
