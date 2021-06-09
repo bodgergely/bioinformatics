@@ -174,6 +174,10 @@ vector<string> freqArrayTable(const string& text, int k) {
     return res;
 }
 
+/**
+ * Returns the list of most frequent kmers
+ * uses sorting to count
+ */
 vector<string> freqArraySorted(const string& text, int k) {
     vector<int> coded;
     coded.reserve(text.size() - k + 1);
@@ -218,6 +222,10 @@ vector<string> freqArraySorted(const string& text, int k) {
     return res;
 }
 
+/**
+ * Returns the list of the most frequent kmers
+ * uses unordered_map to count
+ */
 vector<string> freqArraySet(const string& text, int k) {
     unordered_map<int, int> words;
     words.reserve(text.size() - k + 1);
@@ -282,6 +290,9 @@ vector<measures> competition() {
     return ms;
 }
 
+/**
+ * Returns a list of pairs of the most frequent kmer -> count of the pattern
+ */
 pair<vector<string>, int> findMostFreqKmers(const char* start, uint64_t size,
                                             int k) {
     // idea: code the patterns and sort the coded patterns and count them and
@@ -334,6 +345,9 @@ pair<vector<string>, int> findMostFreqKmers(const char* start, uint64_t size,
     return make_pair(res, maxc);
 }
 
+/**
+ * Find the number of times 'pattern' occurs in 'text'
+ */
 vector<uint64_t> findOccurences(const char* pattern, int patternLen,
                                 const char* text, uint64_t textLen) {
     vector<uint64_t> occurences;
@@ -343,8 +357,6 @@ vector<uint64_t> findOccurences(const char* pattern, int patternLen,
     }
     return occurences;
 }
-
-static char nucleos[] = {'A', 'C', 'G', 'T'};
 
 int hammingDistance(const char* s1, const char* s2, int len) {
     int diff = 0;
@@ -382,6 +394,7 @@ uint32_t approximatePatternCount(const char* pattern, int patternLen,
 static void _generateSimilar(const char* pattern, int patternLen, int pos,
                              int l, int mismatchLimit, char* buffer,
                              int* table) {
+    static const char nucleos[] = {'A', 'C', 'G', 'T'};
     if (pos == patternLen || l > mismatchLimit) {
         return;
     }
@@ -397,12 +410,16 @@ static void _generateSimilar(const char* pattern, int patternLen, int pos,
     }
 }
 
+/**
+ * Output: 'table' - allocated and owned by caller
+ */
 void generateSimilar(const char* pattern, int patternLen, int mismatchLimit,
                      int* table) {
     char* buffer = new char[patternLen];
     memcpy(buffer, pattern, patternLen);
     table[patternToNumber(buffer, patternLen)] = 1;
     _generateSimilar(pattern, patternLen, 0, 1, mismatchLimit, buffer, table);
+    delete[] buffer;
 }
 
 vector<string> generateSimilar(const char* pattern, int patternLen,
@@ -690,8 +707,8 @@ unordered_set<string> commonSet(const vector<vector<string>> candidateSets) {
     return common;
 }
 
-const char* find(const char* where, size_t whereLen, const char* what,
-                 size_t whatLen) {
+const char* findPattern(const char* where, size_t whereLen, const char* what,
+                        size_t whatLen) {
     const char* end = where + whereLen;
     const char* curr = where;
     while (curr + whatLen - 1 < end) {
@@ -731,8 +748,8 @@ public:
                     for (const string& d : dnaSet) {
                         bool pp = false;
                         for (const string& pvar : pvars) {
-                            if (find(d.c_str(), d.size(), pvar.c_str(),
-                                     pvar.size())) {
+                            if (findPattern(d.c_str(), d.size(), pvar.c_str(),
+                                            pvar.size())) {
                                 pp = true;
                                 break;
                             }
