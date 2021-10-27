@@ -6,7 +6,6 @@
         "utility": "cpp"
     },
     "files.exclude": {
-        "**/.*": true,
         "**/*.pyc": true,
         "**/*.sln": true,
         "**/*.vcxproj*": true

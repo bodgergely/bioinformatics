@@ -43,4 +43,25 @@ double avg_cycles_per_microsec(int iterCount)
 }
 
 
+Timer::Timer(ull cyclesPerMicroSec) :
+	_counter(0),
+	_cyclesPerMicroSec(cyclesPerMicroSec)
+{
+}
+
+void Timer::start()
+{
+	_counter = __rdtsc();
+}
+
+ull Timer::stop()
+{
+	return  __rdtsc() - _counter;
+}
+
+ull Timer::microsecs(ull cycles)
+{
+	return cycles / _cyclesPerMicroSec;
+}
+
 
