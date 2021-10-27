@@ -8,6 +8,11 @@
     "files.exclude": {
         "**/*.pyc": true,
         "**/*.sln": true,
-        "**/*.vcxproj*": true
+        "**/*.vcxproj*": true,
+        ".project": true,
+        ".cproject": true,
+        ".pydevproject": true,
+        ".settings": true,
+        "Debug": true
     }
 }
