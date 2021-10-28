@@ -9,14 +9,15 @@
 #include <string>
 #include <vector>
 #include <numeric>
+#include <algorithm>
 #include <cassert>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "rdtsc.h"
 
 using namespace std;
-
 using ull=unsigned long long;
-
 ull cyclesPerMicrosec = 2612;
 
 bool stringsEqual(const string& str1, int idx1, const string& str2, int idx2, int n)
@@ -31,27 +32,6 @@ bool stringsEqual(const string& str1, int idx1, const string& str2, int idx2, in
 int patternCount(const string& text, const string& pattern)
 {
     int count = 0;
-    int patSum = accumulate(pattern.begin(), pattern.end(), 0);
-    int currSum = 0;
-    for (size_t i = 0; i < text.size(); i++) {
-        currSum += text[i];
-        if(i >= pattern.size()) {
-            currSum -= text[i - pattern.size()];
-        }
-        // cout << "At index: " << i << " pat sum is: " << patSum << " curr sum is: " << currSum << endl;
-        if(i >= pattern.size() - 1 && currSum == patSum && stringsEqual(text, i - (pattern.size() - 1), pattern, 0, pattern.size())) {
-            // cout << "Found pattern at index: " << i << endl;
-            count++;
-        }
-                    
-    }
-    // cout << count << endl;
-    return count;
-}
-
-int patternCountSlow(const string& text, const string& pattern)
-{
-    int count = 0;
     if(pattern.size() > text.size()) return 0;
     for (size_t i = 0; i <= text.size() - pattern.size(); i++) {
         if(stringsEqual(text, i, pattern, 0, pattern.size()))
@@ -60,44 +40,64 @@ int patternCountSlow(const string& text, const string& pattern)
     return count;
 }
 
-using PatternCountFunc = int(const string&, const string&);
 
-void testPatternCount(PatternCountFunc func)
+class FrequentWords
 {
-    string t = "CGATATATCCATAG";
-    string pat = "ATA";
-    assert(func(t, pat) == 3);
-    t = "A";
-    pat = "VVV";
-    assert(func(t, pat) == 0);
-    t = "VVVV";
-    pat = "VVV";
-    assert(func(t, pat) == 2);
-}
+public:
+    static unordered_set<string>
+    frequentWords(const string& text, int k)
+    {
+        unordered_set<string> res;
+        unordered_map<string, int> frequencyTable = buildFrequencyTable(text, k);
+        int maxOccurence = maxOccurenceCount(frequencyTable);
+        for(const auto& p : frequencyTable) {
+            if(p.second == maxOccurence) {
+                res.insert(p.first);
+            }
+        }
+        return res;
+    }
+private:
+    static unordered_map<string, int>
+    buildFrequencyTable(const string& text, int k)
+    {
+        unordered_map<string, int> table;
+        if(text.size() < k) return table;
+        for (size_t i = 0; i <= text.size() - k; i++) {
+            table[string(text.begin() + i, text.begin() + i + k)]++;
+        }
+        return table;
+    }
 
-void testAll()
-{
-    testPatternCount(patternCount);
-    testPatternCount(patternCountSlow);
-}
+    static int 
+    maxOccurenceCount(const unordered_map<string, int>& frequencyTable)
+    {
+        int maxCount = 0;
+        for(auto& p : frequencyTable) {
+            maxCount = max(maxCount, p.second);
+        }
+        return maxCount;
+    }
+};
+
 
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv) 
 {
     string text;
     getline(cin, text);
-    string pat;
-    getline(cin, pat);
-
-    cout << "text len: " << text.size() << endl;
-    cout << "pattern len: " << pat.size() << endl;
+    int k;
+    cin >> k;
 
     Timer timer(cyclesPerMicrosec);
     timer.start();
-    cout << patternCount(text, pat) << endl;
-    cout << "hasher comparator took: " << timer.microsecs(timer.stop()) << endl;
-    timer.start();
-    cout << patternCountSlow(text, pat) << endl;
-    cout << "brute force comparator took: "  << timer.microsecs(timer.stop()) << endl;
+    auto res = FrequentWords::frequentWords(text, k);
+    for(auto& v : res) {
+        cout << v << endl;
+    }
 
     return 0;
+}
+
+void testAll()
+{
 }
