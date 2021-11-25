@@ -5,6 +5,7 @@
  *      Author: geri
  */
 #include <iostream>
+#include <string>
 #include "genomeGenerator.h"
 
 using namespace std;
@@ -19,25 +20,11 @@ int main(int argc, char** argv)
 	}
 
 	int size = atoi(argv[1]);
-	const char* file = argv[2];
 
-	char* buff = generate(size);
-
-	ofstream os(file);
-	if(os.is_open())
-	{
-		os << buff;
-		os << "\n";
-		os.close();
-	}
-	else
-	{
-		cout << "Error opening file: " << file << endl;
-		exit(1);
-	}
-
+	string buff = generateRandomGenome(size);
+	cout << buff;
+	cout << "\n";
 	return 0;
-
 }
 
 

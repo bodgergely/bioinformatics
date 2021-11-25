@@ -1,19 +1,22 @@
 #pragma once
-#include <ctime>
-#include <cstdlib>
-#include <fstream>
-char* generate(int size)
+#include <string>
+#include <iostream>
+#include <random>
+
+
+std::string generateRandomGenome(int size)
 {
 	char alphabet[] = {'A', 'C', 'G', 'T'};
-	char* buffer = new char[size + 1];
-	char* pb = buffer;
-	srand(time(NULL));
+	std::random_device device;
+	std::default_random_engine engine(device());
+	std::uniform_int_distribution dist(0, (int)(sizeof(alphabet) / sizeof(alphabet[0])) - 1);
+	std::string res;
 	for(int i=0;i<size;i++)
 	{
-		*pb++ = alphabet[rand() % 4];
+		auto idx = dist(engine); 
+		res.push_back(alphabet[idx]);
 	}
-	*pb = '\0';
 
-	return buffer;
+	return res;
 }
 

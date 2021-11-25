@@ -10,3 +10,7 @@ Replication begins in a genomic region called the replication origin (denoted or
 and is carried out by molecular copy machines called DNA polymerases.
 
 How to find the Ori? 
+
+# Template strands / Complementary strands
+
+Complementary strand: Complement each nucleotide and reverse it

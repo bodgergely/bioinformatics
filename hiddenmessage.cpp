@@ -6,8 +6,12 @@
  */
 
 #include <iostream>
+#include <thread>
+#include <array>
+#include <cstdio>
 #include <string>
 #include <vector>
+#include <utility>
 #include <numeric>
 #include <algorithm>
 #include <cassert>
@@ -15,6 +19,7 @@
 #include <unordered_map>
 
 #include "rdtsc.h"
+#include "utils/genomeGenerator.h"
 
 using namespace std;
 using ull=unsigned long long;
@@ -44,7 +49,7 @@ int patternCount(const string& text, const string& pattern)
 class FrequentWords
 {
 public:
-    static unordered_set<string>
+    static pair<unordered_set<string>, int>
     frequentWords(const string& text, int k)
     {
         unordered_set<string> res;
@@ -55,7 +60,7 @@ public:
                 res.insert(p.first);
             }
         }
-        return res;
+        return make_pair(res, maxOccurence);
     }
 private:
     static unordered_map<string, int>
@@ -80,21 +85,55 @@ private:
     }
 };
 
+void kmerFrequencyChance()
+{
+    int genomeLength = 500;
+    int k = 9;
+    int gotLucky = 0;
+    int lucksNeeded = 5;
+    int repeteCount = 4;
+    ull iter = 0;
+    for(iter=0;gotLucky < lucksNeeded;iter++) {
+        string text = generateRandomGenome(genomeLength);
+        auto res = FrequentWords::frequentWords(text, k);
+        if(res.second >= repeteCount) {
+            gotLucky++;
+            printf("Got lucky (%d) at iter: %llu\n", gotLucky, iter);
+        }
+    }
+    printf("At genomeLen: %d, %d-mer to be repeated at least: %d, the CHANCE is -> %f\n",
+                    genomeLength, k, repeteCount, iter / (double)lucksNeeded);
+}
+
+string reverseComplement(const string& text)
+{
+    static array<pair<char, char>, 4> table = {
+        make_pair('A', 'T'),
+        make_pair('T', 'A'),
+        make_pair('C', 'G'),
+        make_pair('G', 'C'),
+    };
+
+    string res;
+    res.reserve(text.size());
+    for(auto it=text.rbegin(); it!=text.rend();it++) {
+        for(const auto& t : table) {
+            if(t.first == *it)
+                res.push_back(t.second);
+        }
+    }
+
+    cout << res.size() << " text size: " << text.size() << endl;
+
+    assert(res.size() == text.size());
+    return res;
+}
 
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv) 
 {
     string text;
     getline(cin, text);
-    int k;
-    cin >> k;
-
-    Timer timer(cyclesPerMicrosec);
-    timer.start();
-    auto res = FrequentWords::frequentWords(text, k);
-    for(auto& v : res) {
-        cout << v << endl;
-    }
-
+    cout << reverseComplement(text) << endl;
     return 0;
 }
 
