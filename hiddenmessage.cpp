@@ -123,8 +123,6 @@ string reverseComplement(const string& text)
         }
     }
 
-    cout << res.size() << " text size: " << text.size() << endl;
-
     assert(res.size() == text.size());
     return res;
 }
