@@ -31,17 +31,22 @@ unsigned long long estimate_tsc_per_sec()
 	return e - s;
 }
 
-double avg_cycles_per_microsec(int iterCount)
+int avg_cycles_per_microsec(int iterCount)
 {
 	vector<double> s;
 	for(int i=0;i<iterCount;i++)
 	{
-		double cycles_per_micro_sec = estimate_tsc_per_sec() / (double)1000000;
+		auto cycles_per_micro_sec = estimate_tsc_per_sec() / 1000000;
 		s.push_back(cycles_per_micro_sec);
 	}
-	return accumulate(s.begin(), s.end(), 0.0) / s.size();
+	return accumulate(s.begin(), s.end(), 0) / s.size();
 }
 
+Timer::Timer() :
+	_counter(0),
+	_cyclesPerMicroSec(0)
+{
+}
 
 Timer::Timer(ull cyclesPerMicroSec) :
 	_counter(0),
@@ -61,6 +66,9 @@ ull Timer::stop()
 
 ull Timer::microsecs(ull cycles)
 {
+	if(_cyclesPerMicroSec == 0) {
+		_cyclesPerMicroSec = avg_cycles_per_microsec(1);
+	}
 	return cycles / _cyclesPerMicroSec;
 }
 

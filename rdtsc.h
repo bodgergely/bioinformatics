@@ -27,11 +27,12 @@ typedef unsigned long long ull;
 // }
 
 unsigned long long estimate_tsc_per_sec();
-double avg_cycles_per_microsec(int iterCount);
+int avg_cycles_per_microsec(int iterCount);
 
 class Timer 
 {
 public:
+    Timer();
     Timer(ull cyclesPerMicroSec);
     void start();
     ull stop();
