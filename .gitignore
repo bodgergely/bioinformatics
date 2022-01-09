@@ -6,3 +6,4 @@ Debug
 input
 input.txt
 **/*.pyc
+**/*.exe

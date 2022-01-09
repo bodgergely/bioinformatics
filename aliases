@@ -1,3 +1,4 @@
 alias b=$PWD/build.sh
 alias r='b && cat input.txt | $PWD/build/hiddenmessage'
 alias e='vim hiddenmessage.cpp'
+alias run='$PWD/build/hiddenmessage'
