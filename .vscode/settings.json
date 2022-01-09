@@ -3,7 +3,18 @@
         "*.html": "html",
         "ostream": "cpp",
         "string": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "functional": "cpp",
+        "xhash": "cpp",
+        "xiosbase": "cpp",
+        "algorithm": "cpp",
+        "optional": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp"
     },
     "files.exclude": {
         "**/*.pyc": true,
