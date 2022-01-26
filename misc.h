@@ -10,6 +10,8 @@ namespace hiddenmessage
 
 using namespace std;
 
+// ull cyclesPerMicrosec = 2612; // on HP laptop
+
 void kmerFrequencyChance()
 {
     int genomeLength = 500;
@@ -51,6 +53,30 @@ string replaceMostFrequent(const string& text, int k, std::function<string(const
         }
         else {
             res.push_back(text[i]);
+        }
+    }
+    return res;
+}
+
+string highlight(string_view genome, vector<string> patterns, std::function<char(char)> func)
+{
+    vector<pair<int,int>> idxAndLen;
+    for(auto& pattern : patterns) {
+        for(auto& f : findPatternIndexes(pattern, genome)) {
+            idxAndLen.push_back(make_pair(f, pattern.length()));
+        }
+    }
+    string res = genome.data();
+    int modifiedUntil = -1;
+    for(int i=0;i<genome.size();i++) {
+        for(auto& p : idxAndLen) {
+            if(p.first == i) {
+                modifiedUntil = i + p.second - 1;
+                for(int j=i;j<=modifiedUntil;j++) {
+                    res[j] = func(genome[j]);
+                }
+                break;
+            }
         }
     }
     return res;
