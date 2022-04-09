@@ -1,4 +1,6 @@
-alias b=$PWD/build.sh
+alias format='clang-format.exe -i *.cpp *.h'
+alias b='format; $PWD/build.sh'
 alias r='b && cat input.txt | $PWD/build/hiddenmessage'
 alias e='vim hiddenmessage.cpp'
 alias run='$PWD/build/hiddenmessage'
+alias t='$PWD/build-test.sh && $PWD/build/test-hiddenmessage'

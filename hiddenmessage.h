@@ -1,29 +1,27 @@
 #pragma once
 
-#include <unordered_set>
-#include <unordered_map>
-#include <string>
-#include <vector>
-#include <utility>
-#include <numeric>
 #include <algorithm>
+#include <array>
 #include <cassert>
-#include <iostream>
 #include <cstdio>
 #include <functional>
-#include <array>
+#include <iostream>
+#include <numeric>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
-namespace hiddenmessage
-{
+namespace hiddenmessage {
 
 using namespace std;
-using ull=unsigned long long;
+using ull = unsigned long long;
 
 bool stringsEqual(string_view str1, int idx1, string_view str2, int idx2, int n)
 {
-    for(int i=0;i<n;i++) {
-        if(str1[idx1 + i] != str2[idx2 + i]) 
-            return false;
+    for (int i = 0; i < n; i++) {
+        if (str1[idx1 + i] != str2[idx2 + i]) return false;
     }
     return true;
 }
@@ -32,9 +30,8 @@ int hammingDistance(string_view s1, string_view s2)
 {
     int mlen = s1.length() <= s2.length() ? s1.length() : s2.length();
     int d = 0;
-    for(int i=0;i<mlen;i++) {
-        if(s1[i] != s2[i])
-            d++;
+    for (int i = 0; i < mlen; i++) {
+        if (s1[i] != s2[i]) d++;
     }
     return d;
 }
@@ -42,10 +39,9 @@ int hammingDistance(string_view s1, string_view s2)
 int patternCount(string_view text, string_view pattern)
 {
     int count = 0;
-    if(pattern.size() > text.size()) return 0;
+    if (pattern.size() > text.size()) return 0;
     for (size_t i = 0; i <= text.size() - pattern.size(); i++) {
-        if(stringsEqual(text, i, pattern, 0, pattern.size()))
-            count++;
+        if (stringsEqual(text, i, pattern, 0, pattern.size())) count++;
     }
     return count;
 }
@@ -53,53 +49,53 @@ int patternCount(string_view text, string_view pattern)
 int patternCountApprox(string_view text, string_view pattern, int d)
 {
     int count = 0;
-    if(pattern.size() > text.size()) return 0;
+    if (pattern.size() > text.size()) return 0;
     for (size_t i = 0; i <= text.size() - pattern.size(); i++) {
-        if(hammingDistance(string_view(text.begin()+i, pattern.size()), pattern) <= d)
+        if (hammingDistance(string_view(text.begin() + i, pattern.size()),
+                            pattern) <= d)
             count++;
     }
     return count;
 }
 
-class FrequentWords
-{
+class FrequentWords {
 public:
-    static pair<int, vector<string>>
-    frequentWordsWithMismatches(string_view text, int k, int d)
+    static pair<int, vector<string>> frequentWordsWithMismatches(
+        string_view text, int k, int d)
     {
-        
     }
 
-    static pair<int, vector<string>>
-    frequentWords(string_view text, int k)
+    static pair<int, vector<string>> frequentWords(string_view text, int k)
     {
         vector<string> res;
-        unordered_map<string, int> frequencyTable = buildFrequencyTable(text, k);
+        unordered_map<string, int> frequencyTable =
+            buildFrequencyTable(text, k);
         int maxOccurence = maxOccurenceCount(frequencyTable);
-        for(const auto& p : frequencyTable) {
-            if(p.second == maxOccurence) {
+        for (const auto& p : frequencyTable) {
+            if (p.second == maxOccurence) {
                 res.push_back(p.first);
             }
         }
         return make_pair(maxOccurence, res);
     }
 
-    static unordered_map<string, int>
-    buildFrequencyTable(string_view text, int k)
+    static unordered_map<string, int> buildFrequencyTable(string_view text,
+                                                          int k)
     {
         unordered_map<string, int> table;
-        if(text.size() < k) return table;
+        if (text.size() < k) return table;
         for (size_t i = 0; i <= text.size() - k; i++) {
             table[string(text.begin() + i, text.begin() + i + k)]++;
         }
         return table;
     }
+
 private:
-    static int 
-    maxOccurenceCount(const unordered_map<string, int>& frequencyTable)
+    static int maxOccurenceCount(
+        const unordered_map<string, int>& frequencyTable)
     {
         int maxCount = 0;
-        for(auto& p : frequencyTable) {
+        for (auto& p : frequencyTable) {
             maxCount = max(maxCount, p.second);
         }
         return maxCount;
@@ -117,10 +113,9 @@ string reverseComplement(string_view text)
 
     string res;
     res.reserve(text.size());
-    for(auto it=text.rbegin(); it!=text.rend();it++) {
-        for(const auto& t : table) {
-            if(t.first == *it)
-                res.push_back(t.second);
+    for (auto it = text.rbegin(); it != text.rend(); it++) {
+        for (const auto& t : table) {
+            if (t.first == *it) res.push_back(t.second);
         }
     }
 
@@ -132,9 +127,9 @@ vector<int> findPatternIndexes(string_view pattern, string_view text)
 {
     vector<int> res;
     const int n = pattern.size();
-    if(text.size() < n) return res;
-    for(int i=0;i<text.size() - pattern.size()+1;i++) {
-        if(stringsEqual(pattern, 0, text, i, n)) {
+    if (text.size() < n) return res;
+    for (int i = 0; i < text.size() - pattern.size() + 1; i++) {
+        if (stringsEqual(pattern, 0, text, i, n)) {
             res.push_back(i);
         }
     }
@@ -142,17 +137,18 @@ vector<int> findPatternIndexes(string_view pattern, string_view text)
 }
 
 /**
- * d: hamming distance, the number of differences from pattern that can still be considered equal to pattern
+ * d: hamming distance, the number of differences from pattern that can still be
+ * considered equal to pattern
  */
-vector<int> findPatternIndexesApprox(string_view pattern, string_view text, int d)
+vector<int> findPatternIndexesApprox(string_view pattern, string_view text,
+                                     int d)
 {
     vector<int> res;
     int patLen = pattern.length();
-    if(patLen > text.size()) return res;
-    for (int i = 0; i < text.size() - patLen + 1; ++i)
-    {
-        string_view curr(text.begin()+i, patLen);
-        if(hammingDistance(pattern, curr) <= d) {
+    if (patLen > text.size()) return res;
+    for (int i = 0; i < text.size() - patLen + 1; ++i) {
+        string_view curr(text.begin() + i, patLen);
+        if (hammingDistance(pattern, curr) <= d) {
             res.push_back(i);
         }
     }
@@ -169,11 +165,11 @@ vector<string> findClumps(string_view text, int k, int L, int t)
 {
     unordered_set<string> patterns;
     int n = text.size();
-    for(int i=0;i<n - L + 1;i++) {
-        string_view window(text.begin()+i, L);
+    for (int i = 0; i < n - L + 1; i++) {
+        string_view window(text.begin() + i, L);
         auto freqTable = FrequentWords::buildFrequencyTable(window, k);
-        for(const auto& patternAndFreq : freqTable) {
-            if(patternAndFreq.second >= t) {
+        for (const auto& patternAndFreq : freqTable) {
+            if (patternAndFreq.second >= t) {
                 patterns.insert(patternAndFreq.first);
             }
         }
@@ -184,13 +180,13 @@ vector<string> findClumps(string_view text, int k, int L, int t)
 vector<int> skew(string_view text)
 {
     vector<int> res(text.size() + 1, 0);
-    for(int i=0;i<text.size();i++) {
-        res[i+1] = res[i];
-        if(text[i] == 'G') {
-            res[i+1]++;
+    for (int i = 0; i < text.size(); i++) {
+        res[i + 1] = res[i];
+        if (text[i] == 'G') {
+            res[i + 1]++;
         }
-        else if(text[i] == 'C') {
-            res[i+1]--;
+        else if (text[i] == 'C') {
+            res[i + 1]--;
         }
     }
     return res;
@@ -202,10 +198,10 @@ pair<int, vector<int>> minimumSkew(string_view text)
     pair<int, vector<int>> res;
     int mnm = numeric_limits<int>::max();
     vector<int> currLocs;
-    for(int i=0;i<skews.size();i++) {
+    for (int i = 0; i < skews.size(); i++) {
         auto s = skews[i];
-        if(s <= mnm) {
-            if(s < mnm) {
+        if (s <= mnm) {
+            if (s < mnm) {
                 currLocs.clear();
                 mnm = s;
             }
@@ -215,6 +211,4 @@ pair<int, vector<int>> minimumSkew(string_view text)
     return make_pair(mnm, currLocs);
 }
 
-
-
-}
+}  // namespace hiddenmessage

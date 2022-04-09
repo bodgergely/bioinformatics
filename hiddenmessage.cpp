@@ -5,26 +5,21 @@
  *      Author: Gergely Bod
  */
 
-
 #include "hiddenmessage.h"
+
 #include <array>
 
 using namespace hiddenmessage;
 using namespace std;
 
-int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv) 
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    // string text;
-    // getline(cin, text);
-    string s1, s2;
-    int d;
-    getline(cin, s1);
-    getline(cin, s2);
-    cin >> d;
+    string text;
+    int k, d;
+    getline(cin, text);
+    cin >> k >> d;
 
-
-    cout << patternCountApprox(s2, s1, d);
-
+    FrequentWords::frequentWordsWithMismatches(text, k, d);
 
     return 0;
 }
