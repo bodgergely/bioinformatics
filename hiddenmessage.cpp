@@ -19,7 +19,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     getline(cin, text);
     cin >> k >> d;
 
-    FrequentWords::frequentWordsWithMismatches(text, k, d);
+    FrequentWords::WithMismatches(text, k, d);
 
     return 0;
 }

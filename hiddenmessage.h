@@ -18,15 +18,17 @@ namespace hiddenmessage {
 using namespace std;
 using ull = unsigned long long;
 
-bool stringsEqual(string_view str1, int idx1, string_view str2, int idx2, int n)
+bool StringsEqual(string_view str1, int idx1, string_view str2, int idx2, int n)
 {
+    assert((idx1 + n <= str1.length()) && (idx2 + n <= str2.length()));
+    assert(n > 0);
     for (int i = 0; i < n; i++) {
         if (str1[idx1 + i] != str2[idx2 + i]) return false;
     }
     return true;
 }
 
-int hammingDistance(string_view s1, string_view s2)
+int HammingDistance(string_view s1, string_view s2)
 {
     int mlen = s1.length() <= s2.length() ? s1.length() : s2.length();
     int d = 0;
@@ -36,22 +38,22 @@ int hammingDistance(string_view s1, string_view s2)
     return d;
 }
 
-int patternCount(string_view text, string_view pattern)
+int PatternCount(string_view text, string_view pattern)
 {
     int count = 0;
     if (pattern.size() > text.size()) return 0;
     for (size_t i = 0; i <= text.size() - pattern.size(); i++) {
-        if (stringsEqual(text, i, pattern, 0, pattern.size())) count++;
+        if (StringsEqual(text, i, pattern, 0, pattern.size())) count++;
     }
     return count;
 }
 
-int patternCountApprox(string_view text, string_view pattern, int d)
+int PatternCountApprox(string_view text, string_view pattern, int d)
 {
     int count = 0;
     if (pattern.size() > text.size()) return 0;
     for (size_t i = 0; i <= text.size() - pattern.size(); i++) {
-        if (hammingDistance(string_view(text.begin() + i, pattern.size()),
+        if (HammingDistance(string_view(text.begin() + i, pattern.size()),
                             pattern) <= d)
             count++;
     }
@@ -60,17 +62,17 @@ int patternCountApprox(string_view text, string_view pattern, int d)
 
 class FrequentWords {
 public:
-    static pair<int, vector<string>> frequentWordsWithMismatches(
-        string_view text, int k, int d)
+    static pair<int, vector<string>> WithMismatches(string_view text, int k,
+                                                    int d)
     {
     }
 
-    static pair<int, vector<string>> frequentWords(string_view text, int k)
+    static pair<int, vector<string>> ExactMatches(string_view text, int k)
     {
         vector<string> res;
         unordered_map<string, int> frequencyTable =
-            buildFrequencyTable(text, k);
-        int maxOccurence = maxOccurenceCount(frequencyTable);
+            BuildFrequencyTable(text, k);
+        int maxOccurence = MaxOccurenceCount(frequencyTable);
         for (const auto& p : frequencyTable) {
             if (p.second == maxOccurence) {
                 res.push_back(p.first);
@@ -78,8 +80,7 @@ public:
         }
         return make_pair(maxOccurence, res);
     }
-
-    static unordered_map<string, int> buildFrequencyTable(string_view text,
+    static unordered_map<string, int> BuildFrequencyTable(string_view text,
                                                           int k)
     {
         unordered_map<string, int> table;
@@ -91,7 +92,7 @@ public:
     }
 
 private:
-    static int maxOccurenceCount(
+    static int MaxOccurenceCount(
         const unordered_map<string, int>& frequencyTable)
     {
         int maxCount = 0;
@@ -102,7 +103,7 @@ private:
     }
 };
 
-string reverseComplement(string_view text)
+string ReverseComplement(string_view text)
 {
     static array<pair<char, char>, 4> table = {
         make_pair('A', 'T'),
@@ -123,13 +124,13 @@ string reverseComplement(string_view text)
     return res;
 }
 
-vector<int> findPatternIndexes(string_view pattern, string_view text)
+vector<int> FindPatternIndexes(string_view pattern, string_view text)
 {
     vector<int> res;
     const int n = pattern.size();
     if (text.size() < n) return res;
     for (int i = 0; i < text.size() - pattern.size() + 1; i++) {
-        if (stringsEqual(pattern, 0, text, i, n)) {
+        if (StringsEqual(pattern, 0, text, i, n)) {
             res.push_back(i);
         }
     }
@@ -140,7 +141,7 @@ vector<int> findPatternIndexes(string_view pattern, string_view text)
  * d: hamming distance, the number of differences from pattern that can still be
  * considered equal to pattern
  */
-vector<int> findPatternIndexesApprox(string_view pattern, string_view text,
+vector<int> FindPatternIndexesApprox(string_view pattern, string_view text,
                                      int d)
 {
     vector<int> res;
@@ -148,7 +149,7 @@ vector<int> findPatternIndexesApprox(string_view pattern, string_view text,
     if (patLen > text.size()) return res;
     for (int i = 0; i < text.size() - patLen + 1; ++i) {
         string_view curr(text.begin() + i, patLen);
-        if (hammingDistance(pattern, curr) <= d) {
+        if (HammingDistance(pattern, curr) <= d) {
             res.push_back(i);
         }
     }
@@ -161,13 +162,13 @@ vector<int> findPatternIndexesApprox(string_view pattern, string_view text,
  * L: window length
  * t: minimum frequency count needed to be included in the result set
  */
-vector<string> findClumps(string_view text, int k, int L, int t)
+vector<string> FindClumps(string_view text, int k, int L, int t)
 {
     unordered_set<string> patterns;
     int n = text.size();
     for (int i = 0; i < n - L + 1; i++) {
         string_view window(text.begin() + i, L);
-        auto freqTable = FrequentWords::buildFrequencyTable(window, k);
+        auto freqTable = FrequentWords::BuildFrequencyTable(window, k);
         for (const auto& patternAndFreq : freqTable) {
             if (patternAndFreq.second >= t) {
                 patterns.insert(patternAndFreq.first);
@@ -177,7 +178,7 @@ vector<string> findClumps(string_view text, int k, int L, int t)
     return vector<string>(patterns.begin(), patterns.end());
 }
 
-vector<int> skew(string_view text)
+vector<int> Skew(string_view text)
 {
     vector<int> res(text.size() + 1, 0);
     for (int i = 0; i < text.size(); i++) {
@@ -192,9 +193,9 @@ vector<int> skew(string_view text)
     return res;
 }
 
-pair<int, vector<int>> minimumSkew(string_view text)
+pair<int, vector<int>> MinimumSkew(string_view text)
 {
-    auto skews = skew(text);
+    auto skews = Skew(text);
     pair<int, vector<int>> res;
     int mnm = numeric_limits<int>::max();
     vector<int> currLocs;
