@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <functional>
 #include <iostream>
@@ -35,6 +36,7 @@ int HammingDistance(string_view s1, string_view s2)
     for (int i = 0; i < mlen; i++) {
         if (s1[i] != s2[i]) d++;
     }
+    d += abs(static_cast<long long>(s1.length() - s2.length()));
     return d;
 }
 
@@ -65,6 +67,10 @@ public:
     static pair<int, vector<string>> WithMismatches(string_view text, int k,
                                                     int d)
     {
+        (void)text;
+        (void)k;
+        (void)d;
+        return {0, {}};
     }
 
     static pair<int, vector<string>> ExactMatches(string_view text, int k)
