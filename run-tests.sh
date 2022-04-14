@@ -1,3 +1,6 @@
 set -e
 ./build-test.sh && ./build/test-hiddenmessage
-echo "########### Tests Passed. ##################"
+
+if [[ $? == 0 ]]; then
+    echo "########### Tests Passed. ##################"
+fi

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <unordered_set>
+
 #include "hiddenmessage.h"
 
 using namespace hiddenmessage;
@@ -49,6 +51,42 @@ TEST(PatternCount, Complex)
 TEST(PatternCount, PatternLonger)
 {
     EXPECT_EQ(PatternCount("Hell", "Hello"), 0);
+}
+
+TEST(PatternCountApprox, Simple)
+{
+    string text = "HelloHello";
+    EXPECT_EQ(PatternCountApprox(text, "Hello", 0),
+              PatternCount(text, "Hello"));
+    EXPECT_EQ(PatternCountApprox(text, "Hellb", 0), 0);
+    EXPECT_EQ(PatternCountApprox(text, "Hellb", 1), 2);
+    EXPECT_EQ(PatternCountApprox(text, "aaaaa", 5), 6);
+    EXPECT_EQ(PatternCountApprox(text, "aaaaa", 4), 0);
+}
+
+TEST(FrequentWords, ExactMatches)
+{
+    auto most_freq = FrequentWords::ExactMatches("bbaaaaacccbaaa", 3);
+    EXPECT_EQ(most_freq.first, 4);
+    EXPECT_EQ(most_freq.second, vector<string>{"aaa"});
+    most_freq = FrequentWords::ExactMatches("aaaabbbbccccddd", 3);
+    EXPECT_EQ(most_freq.first, 2);
+    EXPECT_EQ(
+        unordered_set<string>(most_freq.second.begin(), most_freq.second.end()),
+        unordered_set<string>({"aaa", "bbb", "ccc"}));
+    most_freq = FrequentWords::ExactMatches("aaaabbbbccccddddd", 3);
+    EXPECT_EQ(most_freq.first, 3);
+    EXPECT_EQ(
+        unordered_set<string>(most_freq.second.begin(), most_freq.second.end()),
+        unordered_set<string>({"ddd"}));
+    most_freq = FrequentWords::ExactMatches("aaaabbbbccccdddeeeee", 3);
+    EXPECT_EQ(most_freq.first, 3);
+    EXPECT_EQ(
+        unordered_set<string>(most_freq.second.begin(), most_freq.second.end()),
+        unordered_set<string>({"eee"}));
+    most_freq = FrequentWords::ExactMatches("aaaaa", 6);
+    EXPECT_EQ(most_freq.first, 0);
+    EXPECT_EQ(most_freq.second, vector<string>{});
 }
 
 int main(int argc, char **argv)
