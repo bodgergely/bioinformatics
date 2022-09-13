@@ -29,7 +29,8 @@ typedef unsigned long long ull;
 unsigned long long estimate_tsc_per_sec();
 int avg_cycles_per_microsec(int iterCount);
 
-class Timer {
+class Timer
+{
 public:
     Timer();
     Timer(ull cyclesPerMicroSec);

@@ -1,6 +1,15 @@
 ---
 BasedOnStyle: Google
-BreakBeforeBraces: Stroustrup
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterEnum: true
+  AfterClass: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterExternBlock: true
+  BeforeCatch: true
 IndentWidth: 4
 TabWidth: 4
 AccessModifierOffset: '-4'
@@ -8,6 +17,9 @@ AllowAllConstructorInitializersOnNextLine: 'true'
 PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: 'true'
 UseTab: Never
+IndentCaseLabels: false
+EmptyLineAfterAccessModifier: Leave
+EmptyLineBeforeAccessModifier: Leave
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
 ...
-
-

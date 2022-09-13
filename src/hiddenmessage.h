@@ -22,7 +22,8 @@ bool StringsEqual(string_view str1, int idx1, string_view str2, int idx2, int n)
     assert((idx1 + n <= str1.length()) && (idx2 + n <= str2.length()));
     assert(n > 0);
     for (int i = 0; i < n; i++) {
-        if (str1[idx1 + i] != str2[idx2 + i]) return false;
+        if (str1[idx1 + i] != str2[idx2 + i])
+            return false;
     }
     return true;
 }
@@ -32,7 +33,8 @@ int HammingDistance(string_view s1, string_view s2)
     int mlen = s1.length() <= s2.length() ? s1.length() : s2.length();
     int d = 0;
     for (int i = 0; i < mlen; i++) {
-        if (s1[i] != s2[i]) d++;
+        if (s1[i] != s2[i])
+            d++;
     }
     d += abs(static_cast<long long>(s1.length() - s2.length()));
     return d;
@@ -41,9 +43,11 @@ int HammingDistance(string_view s1, string_view s2)
 int PatternCount(string_view text, string_view pattern)
 {
     int count = 0;
-    if (pattern.size() > text.size()) return 0;
+    if (pattern.size() > text.size())
+        return 0;
     for (size_t i = 0; i <= text.size() - pattern.size(); i++) {
-        if (StringsEqual(text, i, pattern, 0, pattern.size())) count++;
+        if (StringsEqual(text, i, pattern, 0, pattern.size()))
+            count++;
     }
     return count;
 }
@@ -51,7 +55,8 @@ int PatternCount(string_view text, string_view pattern)
 int PatternCountApprox(string_view text, string_view pattern, int d)
 {
     int count = 0;
-    if (pattern.size() > text.size()) return 0;
+    if (pattern.size() > text.size())
+        return 0;
     for (size_t i = 0; i <= text.size() - pattern.size(); i++) {
         if (HammingDistance(string_view(text.begin() + i, pattern.size()),
                             pattern) <= d)
@@ -60,7 +65,8 @@ int PatternCountApprox(string_view text, string_view pattern, int d)
     return count;
 }
 
-class FrequentWords {
+class FrequentWords
+{
 public:
     static pair<int, vector<string>> WithMismatches(string_view text, int k,
                                                     int d)
@@ -88,7 +94,8 @@ public:
                                                           int k)
     {
         unordered_map<string, int> table;
-        if (text.size() < k) return table;
+        if (text.size() < k)
+            return table;
         for (size_t i = 0; i <= text.size() - k; i++) {
             table[string(text.begin() + i, text.begin() + i + k)]++;
         }
@@ -120,7 +127,8 @@ string ReverseComplement(string_view text)
     res.reserve(text.size());
     for (auto it = text.rbegin(); it != text.rend(); it++) {
         for (const auto& t : table) {
-            if (t.first == *it) res.push_back(t.second);
+            if (t.first == *it)
+                res.push_back(t.second);
         }
     }
 
@@ -132,7 +140,8 @@ vector<int> FindPatternIndexes(string_view pattern, string_view text)
 {
     vector<int> res;
     const int n = pattern.size();
-    if (text.size() < n) return res;
+    if (text.size() < n)
+        return res;
     for (int i = 0; i < text.size() - pattern.size() + 1; i++) {
         if (StringsEqual(pattern, 0, text, i, n)) {
             res.push_back(i);
@@ -150,7 +159,8 @@ vector<int> FindPatternIndexesApprox(string_view pattern, string_view text,
 {
     vector<int> res;
     int patLen = pattern.length();
-    if (patLen > text.size()) return res;
+    if (patLen > text.size())
+        return res;
     for (int i = 0; i < text.size() - patLen + 1; ++i) {
         string_view curr(text.begin() + i, patLen);
         if (HammingDistance(pattern, curr) <= d) {
@@ -189,8 +199,7 @@ vector<int> Skew(string_view text)
         res[i + 1] = res[i];
         if (text[i] == 'G') {
             res[i + 1]++;
-        }
-        else if (text[i] == 'C') {
+        } else if (text[i] == 'C') {
             res[i + 1]--;
         }
     }

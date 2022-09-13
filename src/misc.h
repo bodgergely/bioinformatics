@@ -5,7 +5,8 @@
 #include "hiddenmessage.h"
 #include "utils/genomeGenerator.h"
 
-namespace hiddenmessage {
+namespace hiddenmessage
+{
 
 using namespace std;
 
@@ -51,8 +52,7 @@ string replaceMostFrequent(
         if (mostFrequents.find(curr) != mostFrequents.end()) {
             res += oper(curr);
             i += k;
-        }
-        else {
+        } else {
             res.push_back(text[i]);
         }
     }

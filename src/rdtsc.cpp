@@ -46,9 +46,15 @@ Timer::Timer(ull cyclesPerMicroSec)
 {
 }
 
-void Timer::start() { _counter = __rdtsc(); }
+void Timer::start()
+{
+    _counter = __rdtsc();
+}
 
-ull Timer::stop() { return __rdtsc() - _counter; }
+ull Timer::stop()
+{
+    return __rdtsc() - _counter;
+}
 
 ull Timer::microsecs(ull cycles)
 {

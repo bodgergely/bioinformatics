@@ -5,6 +5,9 @@ alias e='vim $SRC_DIR/hiddenmessage.cpp'
 alias run='$PWD/build/hiddenmessage'
 alias t='format; ./run-tests.sh'
 alias r='b && cat input.txt | $PWD/build/hiddenmessage'
+INCLUDE_PATH="/c/users/gergely.bod/workspace/google/googletest/googletest/include/"
+alias tidy='clang-tidy -header-filter=.* $SRC_DIR/*.cpp -- -DDEBUG -std=c++17 -Wall -Wextra -Weffc++ -Werror -Wpedantic -Wshadow -Wconversion -I$INCLUDE_PATH'
+
 
 #SRC_DIR=$PWD/python
 # alias e='vim $SRC_DIR/genome.py'
