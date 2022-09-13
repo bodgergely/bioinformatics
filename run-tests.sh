@@ -1,5 +1,6 @@
 set -e
-./build-test.sh && ./build/test-hiddenmessage
+BUILD_DIR=$PWD/build
+./build-test.sh && $BUILD_DIR/test-hiddenmessage
 
 if [[ $? == 0 ]]; then
     echo "########### Tests Passed. ##################"

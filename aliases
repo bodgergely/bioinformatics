@@ -1,15 +1,17 @@
-alias format='clang-format.exe -i *.cpp *.h'
+SRC_DIR=$PWD/src
+alias format='clang-format.exe -i $SRC_DIR/*.cpp $SRC_DIR/*.h'
 alias b='format; $PWD/build.sh'
-alias e='vim hiddenmessage.cpp'
+alias e='vim $SRC_DIR/hiddenmessage.cpp'
 alias run='$PWD/build/hiddenmessage'
 alias t='format; ./run-tests.sh'
 alias r='b && cat input.txt | $PWD/build/hiddenmessage'
 
-# alias e='vim genome.py'
+#SRC_DIR=$PWD/python
+# alias e='vim $SRC_DIR/genome.py'
 # alias pytest='"$PYTHON3_DIR_SCRIPTS"/pytest.exe'
 # alias t='pytest'
-# alias r='cat input.txt | python3 ./genome.py'
-# alias run='cat input.txt | python3 ./genome.py'
+# alias r='cat input.txt | python3 $SRC_DIR/genome.py'
+# alias run='cat input.txt | python3 $SRC_DIR/genome.py'
 # alias r=t
 
 alias paste_input="rm input.txt; clip2txt.exe input.txt"

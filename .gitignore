@@ -2,7 +2,7 @@ x64
 Build
 .vs
 Debug
-*.swp
+**/*.swp
 input
 input.txt
 **/*.pyc

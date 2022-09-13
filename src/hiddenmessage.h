@@ -14,8 +14,6 @@
 #include <utility>
 #include <vector>
 
-namespace hiddenmessage {
-
 using namespace std;
 using ull = unsigned long long;
 
@@ -217,5 +215,3 @@ pair<int, vector<int>> MinimumSkew(string_view text)
     }
     return make_pair(mnm, currLocs);
 }
-
-}  // namespace hiddenmessage
