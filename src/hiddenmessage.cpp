@@ -14,11 +14,11 @@ using namespace std;
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     string text;
-    int k, d;
+    string pattern;
     getline(cin, text);
-    cin >> k >> d;
+    getline(cin, pattern);
 
-    FrequentWords::WithMismatches(text, k, d);
+    cout << PatternCount(text, pattern) << endl;
 
     return 0;
 }
