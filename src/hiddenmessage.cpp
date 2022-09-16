@@ -18,7 +18,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     getline(cin, text);
     getline(cin, pattern);
 
-    cout << PatternCount(text, pattern) << endl;
+    cout << patternCount(text, pattern) << endl;
 
     return 0;
 }

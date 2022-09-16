@@ -64,7 +64,7 @@ string highlight(string_view genome, vector<string> patterns,
 {
     vector<pair<int, int>> idxAndLen;
     for (auto& pattern : patterns) {
-        for (auto& f : FindPatternIndexes(pattern, genome)) {
+        for (auto& f : findLocationsOfPattern(pattern, genome)) {
             idxAndLen.push_back(make_pair(f, pattern.length()));
         }
     }
