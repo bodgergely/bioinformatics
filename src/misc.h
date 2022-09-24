@@ -5,9 +5,6 @@
 #include "hiddenmessage.h"
 #include "utils/genomeGenerator.h"
 
-namespace hiddenmessage
-{
-
 using namespace std;
 
 // ull cyclesPerMicrosec = 2612; // on HP laptop
@@ -22,7 +19,7 @@ void kmerFrequencyChance()
     ull iter = 0;
     for (iter = 0; gotLucky < lucksNeeded; iter++) {
         string text = generateRandomGenome(genomeLength);
-        auto res = FrequentWords::FrequentWords(text, k);
+        auto res = FrequentWords::findMostFrequentKmers(text, k);
         if (res.first >= repeteCount) {
             gotLucky++;
             printf("Got lucky (%d) at iter: %llu\n", gotLucky, iter);
@@ -45,7 +42,10 @@ string replaceMostFrequent(
     if (text.size() < k) {
         return text;
     }
-    auto mostFrequents = FrequentWords::FrequentWords(text, k).second;
+    auto mostFrequentsVec =
+        FrequentWords::findMostFrequentKmers(text, k).second;
+    auto mostFrequents = unordered_set<std::string>{mostFrequentsVec.begin(),
+                                                    mostFrequentsVec.end()};
     string res{""};
     for (int i = 0; i < text.size() - k + 1; i++) {
         string curr(text.begin() + i, text.begin() + i + k);
@@ -60,7 +60,7 @@ string replaceMostFrequent(
 }
 
 string highlight(string_view genome, vector<string> patterns,
-                 std::function<char(char)> func)
+                 std::function<char(char)> func = ::tolower)
 {
     vector<pair<int, int>> idxAndLen;
     for (auto& pattern : patterns) {
@@ -83,5 +83,3 @@ string highlight(string_view genome, vector<string> patterns,
     }
     return res;
 }
-
-}  // namespace hiddenmessage

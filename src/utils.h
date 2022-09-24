@@ -2,10 +2,106 @@
 
 #include <algorithm>
 #include <cctype>
+#include <fstream>
 #include <locale>
+#include <map>
+#include <set>
+#include <sstream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+{
+    std::stringstream buf;
+    buf << "[";
+    for (int i = 0; i < vec.size(); i++) {
+        buf << vec[i];
+        buf << ", ";
+    }
+    auto res = buf.str();
+    res.pop_back();
+    res.pop_back();
+    res.push_back(']');
+    os << res;
+    return os;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::set<T>& cont)
+{
+    std::stringstream buf;
+    buf << "[";
+    for (auto it = cont.begin(); it != cont.end(); it++) {
+        buf << *it;
+        buf << ", ";
+    }
+    auto res = buf.str();
+    res.pop_back();
+    res.pop_back();
+    res.push_back(']');
+    os << res;
+    return os;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::unordered_set<T>& cont)
+{
+    std::stringstream buf;
+    buf << "{";
+    for (auto it = cont.begin(); it != cont.end(); it++) {
+        buf << *it;
+        buf << ", ";
+    }
+    auto res = buf.str();
+    res.pop_back();
+    res.pop_back();
+    res.push_back('}');
+    os << res;
+    return os;
+}
+
+template <typename K, typename V>
+std::ostream& operator<<(std::ostream& os, const std::map<K, V>& cont)
+{
+    std::stringstream buf;
+    buf << "{";
+    for (auto it = cont.begin(); it != cont.end(); it++) {
+        buf << it->first;
+        buf << ": ";
+        buf << it->second;
+        buf << ", ";
+    }
+    auto res = buf.str();
+    res.pop_back();
+    res.pop_back();
+    res.push_back('}');
+    os << res;
+    return os;
+}
+
+template <typename K, typename V>
+std::ostream& operator<<(std::ostream& os, const std::unordered_map<K, V>& cont)
+{
+    std::stringstream buf;
+    buf << "{";
+    for (auto it = cont.begin(); it != cont.end(); it++) {
+        buf << it->first;
+        buf << ": ";
+        buf << it->second;
+        buf << ", ";
+    }
+    auto res = buf.str();
+    res.pop_back();
+    res.pop_back();
+    res.push_back('}');
+    os << res;
+    return os;
+}
 
 // trim from start (in place)
-static inline void ltrim(std::string &s)
+static inline void ltrim(std::string& s)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
                 return !std::isspace(ch);
@@ -13,7 +109,7 @@ static inline void ltrim(std::string &s)
 }
 
 // trim from end (in place)
-static inline void rtrim(std::string &s)
+static inline void rtrim(std::string& s)
 {
     s.erase(std::find_if(s.rbegin(), s.rend(),
                          [](unsigned char ch) { return !std::isspace(ch); })
@@ -22,7 +118,7 @@ static inline void rtrim(std::string &s)
 }
 
 // trim from both ends (in place)
-static inline void trim(std::string &s)
+static inline void trim(std::string& s)
 {
     ltrim(s);
     rtrim(s);
@@ -47,4 +143,32 @@ static inline std::string trim_copy(std::string s)
 {
     trim(s);
     return s;
+}
+
+std::string toLower(const std::string& str)
+{
+    auto cp = str;
+    std::transform(cp.begin(), cp.end(), cp.begin(),
+                   [](unsigned char ch) { return std::tolower(ch); });
+    return cp;
+}
+
+void toLowerIP(std::string& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(),
+                   [](unsigned char ch) { return std::tolower(ch); });
+}
+
+std::string toUpper(const std::string& str)
+{
+    auto cp = str;
+    std::transform(cp.begin(), cp.end(), cp.begin(),
+                   [](unsigned char ch) { return std::toupper(ch); });
+    return cp;
+}
+
+void toUpperIP(std::string& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(),
+                   [](unsigned char ch) { return std::toupper(ch); });
 }

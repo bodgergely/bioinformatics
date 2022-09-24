@@ -87,7 +87,66 @@ TEST(FrequentWords, ExactMatches)
     EXPECT_EQ(most_freq.second, vector<string>{});
 }
 
-int main(int argc, char **argv)
+void testLocations(string_view pattern, string_view text,
+                   const unordered_set<int>& expected)
+{
+    auto locs = findLocationsOfPattern(pattern, text);
+    ASSERT_EQ(unordered_set<int>(locs.begin(), locs.end()), expected);
+}
+
+TEST(FindLocations, test1)
+{
+    string text{"GATATATGCATATACTT"};
+    string pattern("ATAT");
+    unordered_set<int> expected{1, 3, 9};
+    testLocations(pattern, text, expected);
+}
+TEST(FindLocations, test2)
+{
+    string text{"TTTTACACTTTTTTGTGTAAAAA"};
+    string pattern("ACAC");
+    unordered_set<int> expected{4};
+    testLocations(pattern, text, expected);
+}
+TEST(FindLocations, test3)
+{
+    string text{
+        "AAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAATTTTATTGACTTAGGT"
+        "CACTAAATACTTTAACCAATATAGGCATAGCGCACAGACAGATAATAATTACAGAGTACACAACATCCA"
+        "T"};
+    string pattern("AAA");
+    unordered_set<int> expected{0, 46, 51, 74};
+    testLocations(pattern, text, expected);
+}
+TEST(FindLocations, test4)
+{
+    string text{
+        "AGCGTGCCGAAATATGCCGCCAGACCTGCTGCGGTGGCCTCGCCGACTTCACGGATGCCAAGTGCATAGA"
+        "GGAAGCGAGCAAAGGTGGTTTCTTTCGCTTTATCCAGCGCGTTAACCACGTTCTGTGCCGACTTT"};
+    string pattern("TTT");
+    unordered_set<int> expected{88, 92, 98, 132};
+    testLocations(pattern, text, expected);
+}
+TEST(FindLocations, test5)
+{
+    string text{"ATATATA"};
+    string pattern("ATA");
+    unordered_set<int> expected{0, 2, 4};
+    testLocations(pattern, text, expected);
+}
+
+TEST(ClumpFinding, test1)
+{
+    // string text{
+    //     "CCACGCGGTGTACGCTGCAAAAAGCCTTGCTGAATCAAATAAGGTTCCAGCACATCCTCAATGGTTTCAC"
+    //     "GTTCTTCGCCAATGGCTGCCGCCAGGTTATCCAGACCTACAGGTCCACCAAAGAACTTATCGATTACCGC"
+    //     "CAGCAACAATTTGCGGTCCATATAATCGAAACCTTCAGCATCGACATTCAACATATCCAGCG"};
+    // auto freqs = findClumps(text, 3, 25, 3);
+    // EXPECT_EQ(unordered_set<string>(freqs.begin(), freqs.end()),
+    //           unordered_set<string>({"AAA", "CAG", "CAT", "GCC", "TTC"}));
+}
+
+int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

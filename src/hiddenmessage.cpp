@@ -14,11 +14,17 @@ using namespace std;
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     string text;
-    string pattern;
     getline(cin, text);
-    getline(cin, pattern);
+    int k, L, t;
+    cin >> k >> L >> t;
 
-    cout << patternCount(text, pattern) << endl;
+    for (auto& c : findClumps(text, k, L, t)) {
+        cout << c << " ";
+    }
+    cout << "\n";
+    for (auto i : findLocationsOfPattern("CCA", text)) {
+        cout << i << " ";
+    }
 
     return 0;
 }

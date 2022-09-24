@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -9,10 +8,9 @@
 #include <iostream>
 #include <numeric>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
-#include <vector>
+
+#include "utils.h"
 
 using namespace std;
 using ull = unsigned long long;
@@ -117,6 +115,7 @@ private:
 
 string reverseComplement(string_view text)
 {
+    auto text_upper = toUpper(string{text});
     static array<pair<char, char>, 4> table = {
         make_pair('A', 'T'),
         make_pair('T', 'A'),
@@ -125,15 +124,15 @@ string reverseComplement(string_view text)
     };
 
     string res;
-    res.reserve(text.size());
-    for (auto it = text.rbegin(); it != text.rend(); it++) {
+    res.reserve(text_upper.size());
+    for (auto it = text_upper.rbegin(); it != text_upper.rend(); it++) {
         for (const auto& t : table) {
             if (t.first == *it)
                 res.push_back(t.second);
         }
     }
 
-    assert(res.size() == text.size());
+    assert(res.size() == text_upper.size());
     return res;
 }
 
