@@ -100,6 +100,19 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_map<K, V>& cont)
     return os;
 }
 
+template <typename T1, typename T2>
+std::ostream& operator<<(std::ostream& os, const std::pair<T1, T2>& p1)
+{
+    std::stringstream buf;
+    buf << "(";
+    buf << p1.first;
+    buf << ",";
+    buf << p1.second;
+    buf << ")";
+    os << buf.str();
+    return os;
+}
+
 // trim from start (in place)
 static inline void ltrim(std::string& s)
 {
