@@ -15,16 +15,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     string text;
     getline(cin, text);
-    int k, L, t;
-    cin >> k >> L >> t;
 
-    for (auto& c : findClumps(text, k, L, t)) {
-        cout << c << " ";
-    }
-    cout << "\n";
-    for (auto i : findLocationsOfPattern("CCA", text)) {
-        cout << i << " ";
-    }
+    auto res = minimumSkew(text);
+    cout << res << endl;
 
     return 0;
 }

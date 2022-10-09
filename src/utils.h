@@ -106,7 +106,7 @@ std::ostream& operator<<(std::ostream& os, const std::pair<T1, T2>& p1)
     std::stringstream buf;
     buf << "(";
     buf << p1.first;
-    buf << ",";
+    buf << ", ";
     buf << p1.second;
     buf << ")";
     os << buf.str();
