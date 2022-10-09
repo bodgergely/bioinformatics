@@ -21,8 +21,10 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
         buf << ", ";
     }
     auto res = buf.str();
-    res.pop_back();
-    res.pop_back();
+    if(vec.size() > 0) {
+        res.pop_back();
+        res.pop_back();
+    }
     res.push_back(']');
     os << res;
     return os;
@@ -38,8 +40,10 @@ std::ostream& operator<<(std::ostream& os, const std::set<T>& cont)
         buf << ", ";
     }
     auto res = buf.str();
-    res.pop_back();
-    res.pop_back();
+    if(cont.size() > 0) {
+        res.pop_back();
+        res.pop_back();
+    }
     res.push_back(']');
     os << res;
     return os;
@@ -55,8 +59,10 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_set<T>& cont)
         buf << ", ";
     }
     auto res = buf.str();
-    res.pop_back();
-    res.pop_back();
+    if(cont.size() > 0) {
+        res.pop_back();
+        res.pop_back();
+    }
     res.push_back('}');
     os << res;
     return os;
@@ -71,11 +77,12 @@ std::ostream& operator<<(std::ostream& os, const std::map<K, V>& cont)
         buf << it->first;
         buf << ": ";
         buf << it->second;
-        buf << ", ";
     }
     auto res = buf.str();
-    res.pop_back();
-    res.pop_back();
+    if(cont.size() > 0) {
+        res.pop_back();
+        res.pop_back();
+    }
     res.push_back('}');
     os << res;
     return os;
@@ -90,11 +97,12 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_map<K, V>& cont)
         buf << it->first;
         buf << ": ";
         buf << it->second;
-        buf << ", ";
     }
     auto res = buf.str();
-    res.pop_back();
-    res.pop_back();
+    if(cont.size() > 0) {
+        res.pop_back();
+        res.pop_back();
+    }
     res.push_back('}');
     os << res;
     return os;
@@ -156,6 +164,17 @@ static inline std::string trim_copy(std::string s)
 {
     trim(s);
     return s;
+}
+
+std::vector<std::string> split(const std::string& str, char delimiter = ' ')
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(str);
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
 }
 
 std::string toLower(const std::string& str)
