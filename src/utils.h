@@ -21,7 +21,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
         buf << ", ";
     }
     auto res = buf.str();
-    if(vec.size() > 0) {
+    if (vec.size() > 0) {
         res.pop_back();
         res.pop_back();
     }
@@ -40,7 +40,7 @@ std::ostream& operator<<(std::ostream& os, const std::set<T>& cont)
         buf << ", ";
     }
     auto res = buf.str();
-    if(cont.size() > 0) {
+    if (cont.size() > 0) {
         res.pop_back();
         res.pop_back();
     }
@@ -59,7 +59,7 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_set<T>& cont)
         buf << ", ";
     }
     auto res = buf.str();
-    if(cont.size() > 0) {
+    if (cont.size() > 0) {
         res.pop_back();
         res.pop_back();
     }
@@ -79,7 +79,7 @@ std::ostream& operator<<(std::ostream& os, const std::map<K, V>& cont)
         buf << it->second;
     }
     auto res = buf.str();
-    if(cont.size() > 0) {
+    if (cont.size() > 0) {
         res.pop_back();
         res.pop_back();
     }
@@ -99,7 +99,7 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_map<K, V>& cont)
         buf << it->second;
     }
     auto res = buf.str();
-    if(cont.size() > 0) {
+    if (cont.size() > 0) {
         res.pop_back();
         res.pop_back();
     }

@@ -13,11 +13,18 @@ using namespace std;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    string text;
-    getline(cin, text);
+    string line1;
+    getline(cin, line1);
 
-    auto res = minimumSkew(text);
-    cout << res << endl;
+    string line2;
+    getline(cin, line2);
+
+    int d;
+    cin >> d;
+
+    for (auto i : findLocationsOfPatternApprox(line1, line2, d)) {
+        cout << i << " ";
+    }
 
     return 0;
 }
