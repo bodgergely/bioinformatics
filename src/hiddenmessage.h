@@ -69,10 +69,11 @@ public:
     static pair<int, vector<string>> findMostFrequentKmersWithMismatches(
         string_view text, int k, int d)
     {
-        (void)text;
-        (void)k;
-        (void)d;
-        return {0, {}};
+        unordered_map<string, int> freqMap;
+        for(int i = 0; i < text.length() - k; i++) {
+            auto pattern = text.substr(i, k);
+            
+        }
     }
 
     static pair<int, vector<string>> findMostFrequentKmers(string_view text,
@@ -158,11 +159,10 @@ vector<int> findLocationsOfPatternApprox(string_view pattern, string_view text,
                                          int d)
 {
     vector<int> res;
-    int patLen = pattern.length();
-    if (patLen > text.size())
+    if (pattern.length() > text.size())
         return res;
-    for (int i = 0; i < text.size() - patLen + 1; ++i) {
-        string_view curr(text.begin() + i, patLen);
+    for (int i = 0; i < text.size() - pattern.length() + 1; ++i) {
+        string_view curr(text.begin() + i, pattern.length());
         if (hammingDistance(pattern, curr) <= d) {
             res.push_back(i);
         }
