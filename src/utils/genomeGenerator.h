@@ -3,7 +3,6 @@
 #include <iostream>
 #include <random>
 
-
 std::string generateRandomGenome(int size)
 {
 	char alphabet[] = {'A', 'C', 'G', 'T'};
@@ -19,4 +18,3 @@ std::string generateRandomGenome(int size)
 
 	return res;
 }
-
