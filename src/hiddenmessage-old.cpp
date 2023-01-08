@@ -58,12 +58,15 @@ string reverseComplement(const string& s)
     return r;
 }
 
-int* freqArray(int k)
+/*
+* Frequency table for a given k length
+*/
+int* freqTable(int k)
 {
-    int freqArraySize = 1 << (2 * k);
-    int* freqArray = new int[freqArraySize];
-    memset(freqArray, 0, sizeof(int) * freqArraySize);
-    return freqArray;
+    int tableSize = 1 << (2 * k); // number of elements in table
+    int* table = new int[tableSize]; // allocate the table
+    memset(table, 0, sizeof(int) * tableSize); // zero out the table
+    return table;
 }
 
 vector<string> mostFrequentWords_N2(const string& text, int k)
@@ -457,7 +460,7 @@ void generateSimilar(const char* pattern, int patternLen, int mismatchLimit,
 vector<string> generateSimilar(const char* pattern, int patternLen,
                                int mismatchLimit)
 {
-    int* table = freqArray(patternLen);
+    int* table = freqTable(patternLen);
     int tableSize = 1 << (2 * patternLen);
     char* buffer = new char[patternLen];
     memcpy(buffer, pattern, patternLen);
@@ -498,7 +501,7 @@ pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text,
                                                           bool reverseIncluded)
 {
     int freqArraySize = 1 << (2 * k);
-    int* fa = freqArray(k);
+    int* fa = freqTable(k);
     computingFrequenciesWithMismatches(text, size, k, d, fa);
     int maxLoc = 0;
     vector<string> r;
@@ -514,7 +517,7 @@ pair<vector<string>, int> findMostFreqKmersWithMismatches(const char* text,
             }
         }
     } else {
-        int* nfa = freqArray(k);
+        int* nfa = freqTable(k);
         bool* processed = new bool[freqArraySize];
         memset(processed, 0, sizeof(bool) * freqArraySize);
         for (int i = 0; i < freqArraySize; i++) {
