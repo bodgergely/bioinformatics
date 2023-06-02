@@ -4,4 +4,7 @@ Build
 .vs
 Debug
 *.swp
+input
 input.txt
+build/
+**/*.pyc
