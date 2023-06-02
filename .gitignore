@@ -1,8 +1,8 @@
 genes
 x64
-Build
+Build/
 .vs
-Debug
+Debug/
 *.swp
 input
 input.txt
