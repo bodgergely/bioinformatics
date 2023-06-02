@@ -133,11 +133,22 @@ def mostFrequentWords(text, k):
     return res 
 
 
-inp = [l for l in sys.stdin]
-text = inp[0]
-k = int(inp[1])
+#################### MAIN #######################
 
-for l in mostFrequentWords(text, k):
-    print(l)
+def main(argv):
+    inp = [l for l in sys.stdin]
+    text = inp[0]
+    k = int(inp[1])
+
+    for l in mostFrequentWords(text, k):
+        print(l)
+
+
+
+if __name__ == "__main__":
+    main(sys.argv)
+
+
+
 
 
