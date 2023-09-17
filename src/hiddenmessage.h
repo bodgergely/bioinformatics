@@ -66,14 +66,14 @@ int patternCountApprox(string_view text, string_view pattern, int d)
 class FrequentWords
 {
 public:
-    static pair<int, vector<string>> findMostFrequentKmersWithMismatches(
-        string_view text, int k, int d)
-    {
-        unordered_map<string, int> freqMap;
-        for (int i = 0; i < text.length() - k; i++) {
-            auto pattern = text.substr(i, k);
-        }
-    }
+    // static pair<int, vector<string>> findMostFrequentKmersWithMismatches(
+    //     string_view text, int k, int d)
+    // {
+    //     unordered_map<string, int> freqMap;
+    //     for (int i = 0; i < text.length() - k; i++) {
+    //         auto pattern = text.substr(i, k);
+    //     }
+    // }
 
     static pair<int, vector<string>> findMostFrequentKmers(string_view text,
                                                            int k)

@@ -43,7 +43,7 @@ def pattern_count_approx(text, pattern, d):
             lambda x, y: hamming_distance(x, y) <= d)
 
 
-def most_frequent_kmer(text, k) -> Tuple[List, int]:
+def most_frequent_kmer(text, k) -> Tuple[Set, int]:
     res = set()
     n = 0
     if len(text) < k:
@@ -65,7 +65,7 @@ def most_frequent_kmer(text, k) -> Tuple[List, int]:
             res.add(el[1])
         else:
             break
-    return list(res), n
+    return res, n
 
 def frequency_table(text, k):
     table = defaultdict(int)

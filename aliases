@@ -6,16 +6,18 @@
 # alias t='format; ./run-tests.sh'
 # alias r='b && cat input.txt | $PWD/build/hiddenmessage'
 # INCLUDE_PATH="/c/users/gergely.bod/workspace/google/googletest/googletest/include/"
-# alias tidy='clang-tidy -header-filter=.* $SRC_DIR/*.cpp -- -DDEBUG -std=c++17 -Wall -Wextra -Weffc++ -Werror -Wpedantic -Wshadow -Wconversion -I$INCLUDE_PATH'
+# alias tidy='clang-tidy -header-filter=.* $SRC_DIR/*.cpp -- -DDEBUG -std=c++20 -Wall -Wextra -Weffc++ -Werror -Wpedantic -Wshadow -Wconversion -I$INCLUDE_PATH'
 
 
 SRC_DIR=$PWD/python
-alias e='vim $SRC_DIR/genome.py'
-alias et='vim $SRC_DIR/test_genome.py'
+# EDITOR=vim
+EDITOR=code
+alias e='$EDITOR $SRC_DIR/genome.py'
+alias et='$EDITOR $SRC_DIR/test_genome.py'
 alias pytest='"$PYTHON3_DIR_SCRIPTS"/pytest.exe'
 alias t='pytest'
 alias r='python3 $SRC_DIR/genome.py'
 alias run='cat input.txt | r'
-#alias r=t
+alias r=t
 
 alias paste_input="rm input.txt; clip2txt.exe input.txt"

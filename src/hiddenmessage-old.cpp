@@ -59,13 +59,13 @@ string reverseComplement(const string& s)
 }
 
 /*
-* Frequency table for a given k length
-*/
+ * Frequency table for a given k length
+ */
 int* freqTable(int k)
 {
-    int tableSize = 1 << (2 * k); // number of elements in table
-    int* table = new int[tableSize]; // allocate the table
-    memset(table, 0, sizeof(int) * tableSize); // zero out the table
+    int tableSize = 1 << (2 * k);               // number of elements in table
+    int* table = new int[tableSize];            // allocate the table
+    memset(table, 0, sizeof(int) * tableSize);  // zero out the table
     return table;
 }
 
