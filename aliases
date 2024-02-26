@@ -19,5 +19,6 @@ alias t='pytest'
 alias r='python3 $SRC_DIR/genome.py'
 alias run='cat input.txt | r'
 alias r=t
+alias mp='python3 -m mypy $SRC_DIR/genome.py'
 
 alias paste_input="rm input.txt; clip2txt.exe input.txt"

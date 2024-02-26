@@ -43,16 +43,16 @@ def pattern_count_approx(text, pattern, d):
             lambda x, y: hamming_distance(x, y) <= d)
 
 
-def most_frequent_kmer(text, k) -> Tuple[Set, int]:
-    res = set()
+def most_frequent_kmer(text, k: int) -> Tuple[Set, int]:
+    res: Set[str] = set()
     n = 0
     if len(text) < k:
         return res, n
-    table = defaultdict(int)
+    table: Dict[str, int] = defaultdict(int)
     for i in range(0, len(text) - k + 1):
         table[text[i : i + k]] += 1
 
-    sorted_table = [
+    sorted_table: List[Tuple[int, str]] = [
         (v, k) for k, v in sorted(table.items(), 
             key=lambda item: item[1], reverse=True)
     ]
@@ -104,7 +104,7 @@ def generate_neighbors(pattern, max_dist):
 
 def frequent_words_with_mismatches(text: str, k: int, d: int) -> List[str]:
     patterns = []
-    freq_map = defaultdict(int)
+    freq_map: Dict[str, int] = defaultdict(int)
     n = len(text)
     for i in range(0, n-k+1):
         pattern = text[i:i+k]
@@ -140,7 +140,7 @@ def reverse_complement_genome(text):
 
 
 def pattern_match_indexes(text, pattern) -> List[int]:
-    res = []
+    res: List[int] = []
     i = 0
     n = len(pattern)
     if n == 0:
@@ -153,7 +153,7 @@ def pattern_match_indexes(text, pattern) -> List[int]:
     return res
 
 def pattern_match_indexes_approx(text, pattern, d: int) -> Iterable[int]:
-    res = []
+    res: List[int] = []
     i = 0
     n = len(pattern)
     if n == 0:
@@ -168,7 +168,7 @@ def pattern_match_indexes_approx(text, pattern, d: int) -> Iterable[int]:
 
 
 def position_table(text: str, k: int) -> Dict[str, List[int]]:
-    pos_map = {}
+    pos_map: Dict[str, List[int]] = {}
     for i in range(len(text) - k + 1):
         pattern = text[i:i + k]
         pos_map.setdefault(pattern, []).append(i)
